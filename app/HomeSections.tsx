@@ -19,7 +19,7 @@ export function HomeSections() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/articles/latest?limit=12")
+    fetch("/api/articles/latest?limit=8")
       .then((r) => (r.ok ? r.json() : []))
       .then(setArticles)
       .finally(() => setLoading(false));
@@ -27,7 +27,7 @@ export function HomeSections() {
 
   return (
     <div className="flex min-h-[80vh] flex-col gap-6">
-      {/* 1st half: RSS – latest 12 articles */}
+      {/* 1st half: RSS – latest 8 articles */}
       <div className="flex flex-col gap-4 min-h-[40vh]">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">RSS</h2>
