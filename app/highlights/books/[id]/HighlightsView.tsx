@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { StickyHeader } from "@/app/components/StickyHeader";
 
 type Highlight = {
   id: number;
@@ -34,7 +35,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <StickyHeader className="flex items-center justify-between">
         <h2 className="text-lg font-medium">Highlights</h2>
         <button
           type="button"
@@ -43,7 +44,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
         >
           {showForm ? "Cancel" : "Add highlight"}
         </button>
-      </div>
+      </StickyHeader>
       {showForm && (
         <AddHighlightForm
           bookId={bookId}

@@ -46,7 +46,7 @@ export function ArticleSummary({
     return (
       <aside className={boxClass} aria-label="Article summary">
         <div className="p-4 sm:p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-amber-700/90 dark:text-amber-300/90 mb-1.5">AI Summary</p>
+          <p className="text-lg font-semibold uppercase tracking-wider text-amber-700/90 dark:text-amber-300/90 mb-1.5">✨ AI Summary</p>
           <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{summary}</p>
         </div>
       </aside>
@@ -56,7 +56,7 @@ export function ArticleSummary({
   return (
     <aside className={boxClass} aria-label="Article summary">
       <div className="p-4 sm:p-5">
-        <p className="text-xs font-semibold uppercase tracking-wider text-amber-700/90 dark:text-amber-300/90 mb-1.5">AI Summary</p>
+        <p className="text-lg font-semibold uppercase tracking-wider text-amber-700/90 dark:text-amber-300/90 mb-1.5">✨ AI Summary</p>
         {error ? (
           <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>
         ) : null}

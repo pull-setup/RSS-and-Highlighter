@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { StickyHeader } from "@/app/components/StickyHeader";
 import { FeedsList } from "./FeedsList";
 
 export function RssPageClient() {
@@ -9,7 +10,7 @@ export function RssPageClient() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2">
+      <StickyHeader className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2">
         <h1 className="text-xl font-semibold sm:text-2xl">RSS Feeds</h1>
         <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-initial sm:items-center sm:min-w-0 sm:max-w-[320px]">
           <label className="sr-only" htmlFor="feeds-search">
@@ -33,7 +34,7 @@ export function RssPageClient() {
             </svg>
           </Link>
         </div>
-      </div>
+      </StickyHeader>
       <FeedsList search={search} />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { StickyHeader } from "@/app/components/StickyHeader";
 
 type LatestArticle = {
   id: number;
@@ -29,7 +30,7 @@ export function HomeSections() {
     <div className="flex min-h-[80vh] flex-col gap-6">
       {/* 1st half: RSS – latest 8 articles */}
       <div className="flex flex-col gap-4 min-h-[40vh]">
-        <div className="flex items-center justify-between">
+        <StickyHeader className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Articles</h2>
           <Link
             href="/rss/articles"
@@ -37,7 +38,7 @@ export function HomeSections() {
           >
             All articles →
           </Link>
-        </div>
+        </StickyHeader>
         {loading ? (
           <p className="text-foreground/60 text-sm">Loading…</p>
         ) : articles.length === 0 ? (
@@ -104,7 +105,7 @@ export function HomeSections() {
 
       {/* 2nd half: Highlights – placeholder */}
       <div className="flex flex-col gap-4 min-h-[40vh]">
-        <div className="flex items-center justify-between">
+        <StickyHeader className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Highlights</h2>
           <Link
             href="/highlights"
@@ -112,7 +113,7 @@ export function HomeSections() {
           >
             All highlights →
           </Link>
-        </div>
+        </StickyHeader>
         <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-black/10 border-dashed bg-black/[.02] dark:border-white/10 dark:bg-white/[.02] py-12">
           <p className="text-foreground/60 text-sm">Highlights will appear here.</p>
           <Link

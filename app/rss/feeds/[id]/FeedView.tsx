@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { StickyHeader } from "@/app/components/StickyHeader";
 import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
 
 const PAGE_SIZE = 12;
@@ -99,7 +100,7 @@ export function FeedView({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:min-h-[44px] sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+        <StickyHeader className="flex flex-col gap-3 sm:flex-row sm:min-h-[44px] sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <Link
               href="/rss"
@@ -160,7 +161,7 @@ export function FeedView({
               </svg>
             </button>
           </div>
-        </div>
+        </StickyHeader>
       {articles.length === 0 ? (
         <p className="text-foreground/70">No articles. Try refreshing.</p>
       ) : filteredArticles.length === 0 ? (

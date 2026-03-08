@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { StickyHeader } from "@/app/components/StickyHeader";
 import { BooksList } from "./BooksList";
 
 export default async function HighlightsPage() {
@@ -11,7 +12,7 @@ export default async function HighlightsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+        <StickyHeader className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Kindle Highlights</h1>
           <Link
             href="/highlights/new"
@@ -19,7 +20,7 @@ export default async function HighlightsPage() {
           >
             Add book
           </Link>
-        </div>
+        </StickyHeader>
         <BooksList />
       </div>
     </div>
