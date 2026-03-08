@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { BookmarkIcon, CheckIcon } from "@/app/components/ArticleIcons";
 
 function isValidReturnTo(v: string | null): v is string {
   if (!v || typeof v !== "string") return false;
@@ -36,12 +37,14 @@ function ExternalLinkIcon({ className }: { className?: string }) {
 export function ArticleActions({
   articleId,
   isRead,
+  isBookmarked,
   articleUrl,
   feedId,
   feedTitle,
 }: {
   articleId: number;
   isRead: boolean;
+  isBookmarked: boolean;
   articleUrl: string;
   feedId: string;
   feedTitle: string;
@@ -50,6 +53,17 @@ export function ArticleActions({
   const returnTo = searchParams.get("returnTo");
   const backHref = isValidReturnTo(returnTo) ? returnTo : `/rss/feeds/${feedId}`;
   const [read, setRead] = useState(isRead);
+  const [bookmarked, setBookmarked] = useState(isBookmarked);
+
+  async function toggleBookmark() {
+    const next = !bookmarked;
+    const res = await fetch(`/api/articles/${articleId}/bookmark`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_bookmarked: next }),
+    });
+    if (res.ok) setBookmarked(next);
+  }
 
   async function toggle() {
     const next = !read;
@@ -65,33 +79,45 @@ export function ArticleActions({
     <div className="flex flex-row items-center justify-between gap-2 min-w-0">
       <Link
         href={backHref}
-        className="flex min-h-[44px] min-w-0 items-center gap-1.5 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 sm:min-h-0 sm:py-0 text-left dark:text-gray-400 dark:hover:text-gray-300"
+        className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center font-bold text-muted transition-colors hover:text-foreground sm:min-h-0 sm:py-0"
+        aria-label="Back"
       >
-        <span className="shrink-0 text-base leading-none">←</span>
-        <span className="truncate">Back</span>
+        ←
       </Link>
       <div className="flex items-center gap-2 shrink-0">
+        <button
+          type="button"
+          onClick={toggleBookmark}
+          aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
+          className={`flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border px-2.5 py-2.5 transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
+            bookmarked
+              ? "border-amber-300/50 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:border-amber-400/30 dark:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/30"
+              : "border-border text-foreground/50 hover:bg-surface"
+          }`}
+        >
+          <BookmarkIcon filled={bookmarked} className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={read ? "Mark unread" : "Mark read"}
+          className={`flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border px-2.5 py-2.5 transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
+            read
+              ? "border-emerald-300/50 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:border-emerald-400/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:hover:bg-emerald-500/30"
+              : "border-border text-foreground/50 hover:bg-surface"
+          }`}
+        >
+          <CheckIcon filled={read} className="h-5 w-5" />
+        </button>
         <a
           href={articleUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Open original article"
-          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 px-2.5 py-2.5 text-foreground/70 transition-colors hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06] sm:min-h-0 sm:min-w-0 sm:py-1.5"
+          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-border px-2.5 py-2.5 text-foreground/70 transition-colors hover:bg-surface sm:min-h-0 sm:min-w-0 sm:py-1.5"
         >
           <ExternalLinkIcon className="h-5 w-5" />
         </a>
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={read ? "Mark unread" : "Mark read"}
-          className={`flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border px-3 py-2.5 text-sm transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
-            read
-              ? "border-black/10 text-foreground/50 hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06]"
-              : "border-black/20 text-foreground hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.06]"
-          }`}
-        >
-          {read ? "Mark unread" : "Mark read"}
-        </button>
       </div>
     </div>
   );

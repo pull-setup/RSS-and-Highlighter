@@ -5,12 +5,42 @@
 :root {
   --background: #f4f4f5;
   --foreground: #171717;
+  --muted: #71717a;
+  --accent: #eab308;
+  --error: #dc2626;
+  --border: rgba(0, 0, 0, 0.1);
+  --surface: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="sepia"] {
+  --background: #f4ecd8;
+  --foreground: #2c2416;
+  --muted: #5c5346;
+  --accent: #b45309;
+  --error: #b91c1c;
+  --border: rgba(44, 36, 22, 0.15);
+  --surface: rgba(44, 36, 22, 0.03);
+}
+
+[data-theme="dark"] {
+  --background: #18181b;
+  --foreground: #ededed;
+  --muted: #a1a1aa;
+  --accent: #facc15;
+  --error: #f87171;
+  --border: rgba(255, 255, 255, 0.1);
+  --surface: rgba(255, 255, 255, 0.04);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --background: #18181b;
     --foreground: #ededed;
+    --muted: #a1a1aa;
+    --accent: #facc15;
+    --error: #f87171;
+    --border: rgba(255, 255, 255, 0.1);
+    --surface: rgba(255, 255, 255, 0.04);
   }
 }
 

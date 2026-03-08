@@ -29,14 +29,19 @@ export async function GET(req: Request) {
   }
   const { searchParams } = new URL(req.url);
   const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit")) || 12));
+  const readOnly = searchParams.get("readOnly") === "true" || searchParams.get("readOnly") === "1";
+  const bookmarkedOnly = searchParams.get("bookmarkedOnly") === "true" || searchParams.get("bookmarkedOnly") === "1";
+  const readFilter = readOnly ? " AND a.is_read = 1" : "";
+  const bookmarkFilter = bookmarkedOnly ? " AND a.is_bookmarked = 1" : "";
+  const orderBy = readOnly || bookmarkedOnly ? "a.published_at DESC, a.id DESC" : "a.is_read ASC, a.published_at DESC, a.id DESC";
 
   let result: { rows: Array<Record<string, unknown>> };
   try {
     result = await db.execute({
-      sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at, a.image_url
+      sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.is_bookmarked, a.created_at, a.image_url
             FROM articles a
-            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
-            ORDER BY a.is_read ASC, a.published_at DESC, a.id DESC
+            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?${readFilter}${bookmarkFilter}
+            ORDER BY ${orderBy}
             LIMIT ?`,
       args: [session.user.id, limit],
     }) as { rows: Array<Record<string, unknown>> };
@@ -44,10 +49,10 @@ export async function GET(req: Request) {
     const msg = String((e as { message?: string })?.message ?? "");
     if (!msg.includes("image_url")) throw e;
     result = await db.execute({
-      sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at
+      sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.is_bookmarked, a.created_at
             FROM articles a
-            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
-            ORDER BY a.is_read ASC, a.published_at DESC, a.id DESC
+            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?${readFilter}${bookmarkFilter}
+            ORDER BY ${orderBy}
             LIMIT ?`,
       args: [session.user.id, limit],
     }) as { rows: Array<Record<string, unknown>> };
@@ -68,6 +73,7 @@ export async function GET(req: Request) {
       author: r.author != null ? String(r.author) : null,
       published_at: r.published_at != null ? String(r.published_at) : null,
       is_read: Boolean(r.is_read),
+      is_bookmarked: Boolean(r.is_bookmarked),
       created_at: String(r.created_at ?? ""),
       thumbnail,
       excerpt: content ? excerptFromHtml(content) : null,

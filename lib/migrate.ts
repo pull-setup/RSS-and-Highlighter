@@ -26,6 +26,14 @@ async function migrate() {
     }
   }
 
+  // Add is_bookmarked column if it doesn't exist (for existing databases)
+  try {
+    await db.execute("ALTER TABLE articles ADD COLUMN is_bookmarked INTEGER NOT NULL DEFAULT 0");
+    console.log("Added is_bookmarked column to articles");
+  } catch {
+    // Column may already exist (duplicate column name)
+  }
+
   console.log("Migration complete");
 }
 

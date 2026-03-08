@@ -25,8 +25,8 @@ export default async function BookPage({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <StickyHeader className="flex items-center gap-4">
-          <Link href="/highlights" className="text-sm text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-300">
-            ← Books
+          <Link href="/highlights" className="font-bold text-muted hover:text-foreground" aria-label="Back to Books">
+            ←
           </Link>
           <div>
             <h1 className="text-2xl font-semibold">{book.title}</h1>

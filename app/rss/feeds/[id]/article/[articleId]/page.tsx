@@ -32,7 +32,7 @@ export default async function ArticlePage({
   const feed = feedRow.rows[0] as unknown as { id: number; title: string };
   let articleRow: { rows: Array<Record<string, unknown>> };
   try {
-    articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, image_url, summary FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
+    articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, is_bookmarked, image_url, summary FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
   } catch {
     articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, image_url FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
   }
@@ -80,6 +80,7 @@ export default async function ArticlePage({
         <ArticleActions
           articleId={article.id}
           isRead={Boolean(article.is_read)}
+          isBookmarked={Boolean(row.is_bookmarked)}
           articleUrl={article.url}
           feedId={feedId}
           feedTitle={feed.title}
@@ -95,7 +96,7 @@ export default async function ArticlePage({
           <ImageWithExpand
             src={article.image_url}
             wrapperClassName="mb-6 min-w-0 overflow-hidden"
-            className="aspect-[2/1] w-full object-cover rounded-lg bg-black/5 dark:bg-white/5"
+            className="aspect-[2/1] w-full object-cover rounded-lg bg-surface"
           />
         )}
         <ArticleTextZoom>

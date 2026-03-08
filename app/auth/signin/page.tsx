@@ -69,14 +69,14 @@ function SignInForm() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/[.02] dark:bg-white/[.06] p-6"
+        className="w-full max-w-sm flex flex-col gap-4 rounded-lg border border-border bg-surface p-6"
       >
         <h1 className="text-xl font-semibold">Sign in</h1>
         {error && (
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-sm text-error">{error}</p>
         )}
         {needTotp && (
-          <p className="text-sm text-foreground/70">
+          <p className="text-sm text-muted">
             Enter the 6-digit code from your authenticator app.
           </p>
         )}
@@ -88,7 +88,7 @@ function SignInForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             readOnly={needTotp}
-            className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm read-only:opacity-70"
+            className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground read-only:opacity-70"
           />
         </label>
         <label className="flex flex-col gap-1">
@@ -99,7 +99,7 @@ function SignInForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
             readOnly={needTotp}
-            className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm read-only:opacity-70"
+            className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground read-only:opacity-70"
           />
         </label>
         {needTotp && (
@@ -113,7 +113,7 @@ function SignInForm() {
               onChange={(e) => setTotp(e.target.value.replace(/\D/g, "").slice(0, 6))}
               placeholder="000000"
               maxLength={6}
-              className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm font-mono tracking-widest"
+              className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground font-mono tracking-widest"
             />
           </label>
         )}
@@ -132,7 +132,7 @@ function SignInForm() {
               setTotp("");
               setError("");
             }}
-            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            className="text-sm text-muted hover:text-foreground"
           >
             ← Back
           </button>

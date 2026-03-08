@@ -131,10 +131,8 @@ export function ArticleContent({ content }: { content: string | null }) {
         .article-body pre { white-space: pre-wrap; word-break: break-word; }
         .article-body .article-image-wrap img { pointer-events: none; cursor: pointer; }
         .article-body .article-image-wrap { cursor: pointer; }
-        .article-body a { text-decoration: underline; color: #6b7280; }
-        .article-body a:hover { color: #4b5563; }
-        .dark .article-body a { color: #9ca3af; }
-        .dark .article-body a:hover { color: #d1d5db; }
+        .article-body a { text-decoration: underline; color: var(--muted); }
+        .article-body a:hover { color: var(--foreground); }
         .article-body p { margin-bottom: 0.75rem; text-align: justify; }
         .article-body h2 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: 700; }
         .article-body h3 { margin-top: 1.25rem; margin-bottom: 0.4rem; font-size: 1.1rem; font-weight: 600; }
@@ -142,7 +140,7 @@ export function ArticleContent({ content }: { content: string | null }) {
         .article-body ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .article-body ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
         .article-body li { margin-bottom: 0.25rem; }
-        .article-body blockquote { border-left: 3px solid rgba(128,128,128,0.4); padding-left: 1rem; margin: 1rem 0; opacity: 0.8; }
+        .article-body blockquote { border-left: 3px solid var(--border); padding-left: 1rem; margin: 1rem 0; opacity: 0.8; }
         .article-body figure { margin: 1.25rem auto; text-align: center; }
         .article-body figcaption { font-size: 0.82rem; opacity: 0.6; text-align: center; margin-top: 0.3rem; }
         .article-body video { display: block; margin-left: auto; margin-right: auto; max-width: 100%; border-radius: 8px; }

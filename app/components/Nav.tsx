@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { useTheme } from "./ThemeProvider";
 
 function BookIcon({ className }: { className?: string }) {
   return (
@@ -25,8 +26,25 @@ function firstWord(value: string | null | undefined): string {
   return value.trim().split(/\s+/)[0] ?? "";
 }
 
+function SunIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+  );
+}
+
+function MoonIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  );
+}
+
 export function Nav() {
   const { data: session, status } = useSession();
+  const { theme, setTheme } = useTheme();
   const [totpEnabled, setTotpEnabled] = useState<boolean | null>(null);
   const firstName = firstWord(session?.user?.name ?? session?.user?.email ?? null);
 
@@ -43,11 +61,11 @@ export function Nav() {
 
   return (
     <nav
-      className="z-50 border-b border-black/10 dark:border-white/10 bg-[var(--background)] [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]"
+      className="z-50 border-b border-border bg-[var(--background)] [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]"
     >
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 min-h-[3rem] sm:min-h-[3.5rem] flex flex-wrap items-center justify-between gap-2 sm:gap-4 py-2 sm:py-0">
+      <div className="max-w-[1080px] mx-auto px-3 sm:px-4 min-h-[3rem] sm:min-h-[3.5rem] flex flex-wrap items-center justify-between gap-2 sm:gap-4 py-2 sm:py-0">
         <div className="flex justify-start items-center gap-2 min-h-[44px] min-w-0">
-          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 min-h-[44px] items-center py-1">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 text-accent hover:text-accent/80 min-h-[44px] items-center py-1">
             <BookIcon className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
             <span className="text-lg sm:text-xl font-semibold truncate">Reeder</span>
           </Link>
@@ -55,18 +73,40 @@ export function Nav() {
         <div className="flex items-center gap-4 sm:gap-6 min-h-[44px]">
           <Link
             href="/rss"
-            className="text-sm text-gray-500 hover:text-gray-700 hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center dark:text-gray-400 dark:hover:text-gray-300"
+            className="text-sm text-muted hover:text-foreground hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center"
           >
             Feeds
           </Link>
           <Link
             href="/highlights"
-            className="text-sm text-gray-500 hover:text-gray-700 hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center dark:text-gray-400 dark:hover:text-gray-300"
+            className="text-sm text-muted hover:text-foreground hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center"
           >
             Books
           </Link>
         </div>
         <div className="flex items-center justify-end gap-2 sm:gap-3 min-h-[44px]">
+          <div className="flex items-center gap-0.5 rounded border border-border p-0.5">
+            <button
+              type="button"
+              onClick={() => setTheme("sepia")}
+              aria-label="Sepia mode"
+              className={`flex min-h-[36px] min-w-[36px] items-center justify-center rounded transition-colors ${
+                theme === "sepia" ? "bg-amber-200/50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200" : "text-foreground/50 hover:text-foreground/70"
+              }`}
+            >
+              <SunIcon className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setTheme("dark")}
+              aria-label="Dark mode"
+              className={`flex min-h-[36px] min-w-[36px] items-center justify-center rounded transition-colors ${
+                theme === "dark" ? "bg-black/10 dark:bg-white/10 text-foreground" : "text-foreground/50 hover:text-foreground/70"
+              }`}
+            >
+              <MoonIcon className="h-4 w-4" />
+            </button>
+          </div>
           {status === "loading" ? (
             <span className="text-sm text-foreground/60 py-2">...</span>
           ) : session ? (
@@ -77,7 +117,7 @@ export function Nav() {
               {!totpEnabled && (
                 <Link
                   href="/auth/totp"
-                  className="text-sm text-gray-500 hover:text-gray-700 hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center dark:text-gray-400 dark:hover:text-gray-300"
+                  className="text-sm text-muted hover:text-foreground hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center"
                 >
                   2FA
                 </Link>
@@ -85,7 +125,7 @@ export function Nav() {
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded text-red-600 hover:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded text-error hover:bg-error/10"
                 aria-label="Sign out"
               >
                 <SignOutIcon className="h-5 w-5" />
@@ -94,7 +134,7 @@ export function Nav() {
           ) : (
             <Link
               href="/auth/signin"
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 hover:underline underline-offset-4 min-h-[44px] flex items-center py-2 dark:text-gray-400 dark:hover:text-gray-300"
+              className="text-sm font-medium text-muted hover:text-foreground hover:underline underline-offset-4 min-h-[44px] flex items-center py-2"
             >
               Sign in
             </Link>

@@ -35,7 +35,7 @@ export function AddFeedForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md">
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
       <label className="flex flex-col gap-1">
         <span className="text-sm font-medium">Feed URL</span>

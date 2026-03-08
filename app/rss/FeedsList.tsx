@@ -44,12 +44,12 @@ export function FeedsList({ search = "" }: { search?: string }) {
   const filtered = feeds;
 
   if (loading) return <p className="text-foreground/70">Loading…</p>;
-  if (error) return <p className="text-red-600 dark:text-red-400">{error}</p>;
+  if (error) return <p className="text-error">{error}</p>;
   if (feeds.length === 0) {
     return (
       <p className="text-foreground/70">
         No feeds yet.{" "}
-        <Link href="/rss/new" className="text-gray-500 underline underline-offset-4 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+        <Link href="/rss/new" className="text-muted underline underline-offset-4 hover:text-foreground">
           Add one
         </Link>
         .
@@ -68,12 +68,12 @@ export function FeedsList({ search = "" }: { search?: string }) {
           <li key={feed.id}>
             <Link
               href={`/rss/feeds/${feed.id}`}
-              className="flex min-h-[72px] items-center gap-3 rounded-xl border border-black/10 p-3 transition-colors hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06] sm:min-h-0 sm:gap-4 sm:p-4"
+              className="flex min-h-[72px] items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-surface sm:min-h-0 sm:gap-4 sm:p-4"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-foreground/60 sm:h-9 sm:w-9">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-muted sm:h-9 sm:w-9">
                 {index + 1}
               </span>
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-black/10 dark:bg-white/10 sm:h-14 sm:w-14">
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface sm:h-14 sm:w-14">
                 {showFavicon ? (
                   <img
                     src={favicon}
@@ -85,7 +85,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
                     }}
                   />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center text-lg font-semibold text-foreground/70 sm:text-xl">
+                  <span className="flex h-full w-full items-center justify-center text-lg font-semibold text-muted sm:text-xl">
                     {initial}
                   </span>
                 )}
@@ -95,12 +95,12 @@ export function FeedsList({ search = "" }: { search?: string }) {
                   {feed.title}
                 </span>
                 {feed.description ? (
-                  <p className="mt-0.5 truncate text-sm text-foreground/60 line-clamp-1">
+                  <p className="mt-0.5 truncate text-sm text-muted line-clamp-1">
                     {feed.description}
                   </p>
                 ) : null}
               </div>
-              <span className="shrink-0 text-foreground/40" aria-hidden>
+              <span className="shrink-0 text-muted" aria-hidden>
                 <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -110,7 +110,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
         );
       })}
       {filtered.length === 0 && (
-        <li className="col-span-full text-foreground/60 text-sm">No feeds match your search.</li>
+        <li className="col-span-full text-muted text-sm">No feeds match your search.</li>
       )}
     </ul>
   );

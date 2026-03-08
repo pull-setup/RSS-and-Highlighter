@@ -1,11 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTheme } from "./ThemeProvider";
 
 const baseStyle = (v: string) =>
   `sticky top-2 py-3 transition-all duration-300 ease-out ${v === "fullWidth" ? "z-40" : "z-30"}`;
-const stuckStyle = (stuck: boolean) =>
-  stuck ? "bg-black/60 backdrop-blur-md rounded-3xl border border-gray-500/30" : "bg-transparent backdrop-blur-none rounded-none border border-transparent";
+
+function getStuckStyle(stuck: boolean, theme: "sepia" | "dark") {
+  if (!stuck) return "bg-transparent backdrop-blur-none rounded-none border border-transparent";
+  if (theme === "sepia") return "bg-amber-50/70 backdrop-blur-md rounded-3xl border border-amber-200/50";
+  return "bg-zinc-900/70 backdrop-blur-md rounded-3xl border border-zinc-600/40";
+}
 
 export function StickyHeader({
   children,
@@ -16,6 +21,7 @@ export function StickyHeader({
   className?: string;
   variant?: "default" | "fullWidth";
 }) {
+  const { theme } = useTheme();
   const [stuck, setStuck] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +44,7 @@ export function StickyHeader({
     <>
       <div ref={sentinelRef} className="h-px" aria-hidden />
       <div
-        className={`${baseStyle(variant)} ${layoutClass} ${stuckStyle(stuck)} ${className}`}
+        className={`${baseStyle(variant)} ${layoutClass} ${getStuckStyle(stuck, theme)} ${className}`}
       >
         {children}
       </div>

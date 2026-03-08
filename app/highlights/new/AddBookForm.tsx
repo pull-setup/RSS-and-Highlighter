@@ -41,7 +41,7 @@ export function AddBookForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md">
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
       <label className="flex flex-col gap-1">
         <span className="text-sm font-medium">Title</span>
@@ -50,7 +50,7 @@ export function AddBookForm() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+          className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -60,7 +60,7 @@ export function AddBookForm() {
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
           required
-          className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+          className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -70,7 +70,7 @@ export function AddBookForm() {
           value={asin}
           onChange={(e) => setAsin(e.target.value)}
           placeholder="B00..."
-          className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+          className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
       <button

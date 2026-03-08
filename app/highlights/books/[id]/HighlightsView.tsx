@@ -31,7 +31,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
   }, [load]);
 
   if (loading) return <p className="text-foreground/70">Loading…</p>;
-  if (error) return <p className="text-red-600 dark:text-red-400">{error}</p>;
+  if (error) return <p className="text-error">{error}</p>;
 
   return (
     <div className="flex flex-col gap-6">
@@ -40,7 +40,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
         <button
           type="button"
           onClick={() => setShowForm((s) => !s)}
-          className="text-sm text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-300"
+          className="text-sm text-muted hover:text-foreground hover:underline"
         >
           {showForm ? "Cancel" : "Add highlight"}
         </button>
@@ -61,7 +61,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
           {highlights.map((h) => (
             <li
               key={h.id}
-              className="rounded-lg border border-black/10 dark:border-white/10 p-2"
+              className="rounded-lg border border-border p-2"
             >
               <p className="text-foreground whitespace-pre-wrap">{h.content}</p>
               {(h.location || h.note) && (
@@ -123,9 +123,9 @@ function AddHighlightForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/[.02] dark:bg-white/[.06]">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4 rounded-lg border border-border bg-surface">
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
       <label className="flex flex-col gap-1">
         <span className="text-sm font-medium">Highlight text</span>
@@ -134,7 +134,7 @@ function AddHighlightForm({
           onChange={(e) => setContent(e.target.value)}
           required
           rows={3}
-          className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm resize-y"
+          className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground resize-y"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -144,7 +144,7 @@ function AddHighlightForm({
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="e.g. 1234"
-          className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+          className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -153,7 +153,7 @@ function AddHighlightForm({
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+          className="rounded border border-border bg-background px-3 py-2 text-sm text-foreground"
         />
       </label>
       <div className="flex gap-2">
@@ -167,7 +167,7 @@ function AddHighlightForm({
         <button
           type="button"
           onClick={() => { setContent(""); setLocation(""); setNote(""); }}
-          className="rounded border border-black/10 dark:border-white/10 py-2 px-4 text-sm hover:bg-black/[.02] dark:hover:bg-white/[.06]"
+          className="rounded border border-border py-2 px-4 text-sm text-foreground hover:bg-surface"
         >
           Clear
         </button>

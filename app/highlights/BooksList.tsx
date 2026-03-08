@@ -25,7 +25,7 @@ export function BooksList() {
   }, []);
 
   if (loading) return <p className="text-foreground/70">Loading…</p>;
-  if (error) return <p className="text-red-600 dark:text-red-400">{error}</p>;
+  if (error) return <p className="text-error">{error}</p>;
   if (books.length === 0) {
     return (
       <p className="text-foreground/70">
@@ -44,7 +44,7 @@ export function BooksList() {
         <li key={book.id}>
           <Link
             href={`/highlights/books/${book.id}`}
-            className="block rounded-lg border border-black/10 dark:border-white/10 p-4 hover:bg-black/[.02] dark:hover:bg-white/[.06]"
+            className="block rounded-lg border border-border p-4 hover:bg-surface"
           >
             <span className="font-medium">{book.title}</span>
             <p className="text-sm text-foreground/70 mt-1">{book.author}</p>

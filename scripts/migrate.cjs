@@ -69,6 +69,14 @@ async function migrate() {
     if (!/duplicate column|already exists/i.test(msg)) throw err;
   }
 
+  try {
+    await db.execute("ALTER TABLE articles ADD COLUMN is_bookmarked INTEGER NOT NULL DEFAULT 0");
+    console.log("Added is_bookmarked column to articles");
+  } catch (err) {
+    const msg = String(err?.message ?? err?.cause?.message ?? "");
+    if (!/duplicate column|already exists/i.test(msg)) throw err;
+  }
+
   console.log("Migration complete");
 }
 

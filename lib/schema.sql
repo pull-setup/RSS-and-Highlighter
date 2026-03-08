@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS articles (
   author TEXT,
   published_at TEXT,
   is_read INTEGER NOT NULL DEFAULT 0,
+  is_bookmarked INTEGER NOT NULL DEFAULT 0,
   image_url TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(feed_id, guid)

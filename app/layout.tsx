@@ -33,14 +33,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem("reeder-theme");if(t==="dark"||t==="sepia"){document.documentElement.setAttribute("data-theme",t);if(t==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark");}else{document.documentElement.setAttribute("data-theme","sepia");document.documentElement.classList.remove("dark");}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
           <TextZoomProvider>
             <Nav />
-            <main className="flex-1 max-w-4xl w-full mx-auto min-w-0 px-4 py-6 sm:px-6 md:px-8 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
+            <main className="flex-1 max-w-[1080px] w-full mx-auto min-w-0 px-4 py-6 sm:px-6 md:px-8 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
               <TextZoomContent>{children}</TextZoomContent>
             </main>
           </TextZoomProvider>

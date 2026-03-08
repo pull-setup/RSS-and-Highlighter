@@ -3,9 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
+import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
+import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { HighlightText } from "@/app/components/HighlightText";
 import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 36;
 
 type Article = {
   id: number;
@@ -16,6 +19,7 @@ type Article = {
   author: string | null;
   published_at: string | null;
   is_read: boolean;
+  is_bookmarked: boolean;
   created_at: string;
   thumbnail?: string | null;
   excerpt?: string | null;
@@ -31,6 +35,8 @@ export function FeedView({
   const [articles, setArticles] = useState<Article[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+  const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -38,8 +44,12 @@ export function FeedView({
   const [error, setError] = useState("");
 
   const load = useCallback((offset: number, append: boolean) => {
+    if (!append) setLoading(true);
     const limit = PAGE_SIZE;
-    return fetch(`/api/feeds/${feedId}/articles?limit=${limit}&offset=${offset}`)
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
+    if (readOnly) params.set("readOnly", "true");
+    return fetch(`/api/feeds/${feedId}/articles?${params}`)
       .then(async (r) => {
         if (!r.ok) {
           const data = await r.json().catch(() => ({}));
@@ -49,9 +59,8 @@ export function FeedView({
       })
       .then(({ articles: data, total: feedTotal }) => {
         setTotal(feedTotal);
-        const nextTotal = append ? articles.length + data.length : data.length;
         setArticles((prev) => (append ? [...prev, ...data] : data));
-        setHasMore(data.length === limit && nextTotal < MAX_ARTICLES_PER_FEED);
+        setHasMore(data.length === limit && offset + data.length < Math.min(feedTotal, MAX_ARTICLES_PER_FEED));
       })
       .catch((err: Error) => setError(err.message || "Failed to load articles"))
       .finally(() => {
@@ -59,7 +68,7 @@ export function FeedView({
         setLoadingMore(false);
         setRefreshing(false);
       });
-  }, [feedId]);
+  }, [feedId, bookmarkedOnly, readOnly]);
 
   useEffect(() => {
     load(0, false);
@@ -85,17 +94,21 @@ export function FeedView({
   }
 
   const searchLower = search.trim().toLowerCase();
-  const filteredArticles = searchLower
-    ? articles.filter(
-        (a) =>
-          a.title.toLowerCase().includes(searchLower) ||
-          (a.content != null && a.content.toLowerCase().includes(searchLower)) ||
-          (a.excerpt != null && a.excerpt.toLowerCase().includes(searchLower))
-      )
-    : articles;
+  const effectiveSearch = searchLower.length >= 2 ? searchLower : "";
+  const matchInContent = (a: Article) =>
+    effectiveSearch &&
+    !a.title.toLowerCase().includes(effectiveSearch) &&
+    ((a.content != null && a.content.toLowerCase().includes(effectiveSearch)) ||
+      (a.excerpt != null && a.excerpt.toLowerCase().includes(effectiveSearch)));
+  const filteredArticles = articles.filter(
+    (a) =>
+      !effectiveSearch ||
+      a.title.toLowerCase().includes(effectiveSearch) ||
+      (a.content != null && a.content.toLowerCase().includes(effectiveSearch)) ||
+      (a.excerpt != null && a.excerpt.toLowerCase().includes(effectiveSearch))
+  );
 
-  if (loading) return <p className="text-foreground/70">Loading…</p>;
-  if (error) return <p className="text-red-600 dark:text-red-400">{error}</p>;
+  if (error) return <p className="text-error">{error}</p>;
 
   return (
     <div className="flex flex-col gap-6">
@@ -104,19 +117,26 @@ export function FeedView({
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <Link
               href="/rss"
-              className="shrink-0 text-sm text-gray-500 hover:text-gray-700 hover:underline min-h-[44px] flex items-center py-1 dark:text-gray-400 dark:hover:text-gray-300"
+              className="shrink-0 font-bold text-muted hover:text-foreground min-h-[44px] flex items-center py-1"
+              aria-label="Back to Feeds"
             >
-              ← Feeds
+              ←
             </Link>
             <h1 className="truncate text-lg font-semibold sm:text-xl md:text-2xl">{feedTitle}</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <ArticleFilterCheckboxes
+              bookmarkedOnly={bookmarkedOnly}
+              readOnly={readOnly}
+              onBookmarkedOnlyChange={setBookmarkedOnly}
+              onReadOnlyChange={setReadOnly}
+            />
             <label className="sr-only" htmlFor="feed-articles-search">
               Search articles
             </label>
-            <div className="relative flex-1 min-w-0 w-full max-w-[250px] md:max-w-[300px]">
+            <div className="relative flex-1 min-w-0 w-full max-w-[480px] sm:max-w-[600px] md:max-w-[720px]">
               <svg
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/50"
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -135,14 +155,14 @@ export function FeedView({
                 placeholder="Search articles…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-black/10 bg-transparent py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-foreground/50 dark:border-white/10 min-h-[44px]"
+                className="w-full rounded-lg border border-border bg-transparent py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted min-h-[44px]"
               />
             </div>
             <button
               type="button"
               onClick={refresh}
               disabled={refreshing}
-              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-500/10 disabled:opacity-50 dark:text-blue-400 dark:hover:bg-blue-500/20"
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-accent transition-colors hover:bg-accent/10 disabled:opacity-50"
               aria-label={refreshing ? "Refreshing feed" : "Refresh feed"}
             >
               <svg
@@ -162,79 +182,88 @@ export function FeedView({
             </button>
           </div>
         </StickyHeader>
-      {articles.length === 0 ? (
-        <p className="text-foreground/70">No articles. Try refreshing.</p>
-      ) : filteredArticles.length === 0 ? (
-        <p className="text-foreground/60 text-sm">No articles match your search.</p>
-      ) : (
-        <>
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-            {filteredArticles.map((article) => (
-              <li
-                key={article.id}
-                className={`flex flex-col overflow-hidden rounded-xl border ${
-                  article.is_read
-                    ? "border-black/5 dark:border-white/5 bg-black/[.01] dark:bg-white/[.02]"
-                    : "border-black/10 dark:border-white/10"
-                }`}
-              >
-                <Link
-                  href={`/rss/feeds/${feedId}/article/${article.id}?returnTo=/rss/feeds/${feedId}`}
-                  className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
+        {loading ? (
+          <ArticleSkeletonGrid count={PAGE_SIZE} />
+        ) : articles.length === 0 ? (
+          <p className="text-foreground/70">No articles. Try refreshing.</p>
+        ) : filteredArticles.length === 0 ? (
+          <p className="text-foreground/60 text-sm">No articles match your search.</p>
+        ) : (
+          <>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+              {filteredArticles.map((article) => (
+                <li
+                  key={article.id}
+                  className={`flex flex-col overflow-hidden rounded-xl border ${
+                    matchInContent(article)
+                      ? "border-2 border-amber-500 dark:border-amber-400 bg-amber-50/40 dark:bg-amber-950/30"
+                      : article.is_read
+                        ? "border-border bg-surface"
+                        : "border-border"
+                  }`}
                 >
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-sm font-bold leading-snug text-foreground sm:text-base">
-                      {article.title}
-                    </h2>
-                    <p className="mt-1.5 text-xs uppercase tracking-wide text-foreground/60 sm:mt-2">
-                      {article.published_at
-                        ? new Date(article.published_at).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }).toUpperCase()
-                        : ""}
-                      {article.author ? ` • ${article.author.toUpperCase()}` : ""}
-                    </p>
-                  </div>
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-black/5 dark:bg-white/5 sm:h-24 sm:w-24">
-                    {article.thumbnail ? (
-                      <img
-                        src={article.thumbnail}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-foreground/30 text-xs">
-                        No image
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {!search.trim() && filteredArticles.length > 0 && (
-            <p className="text-center text-sm text-foreground/60 pt-1">
-              Showing 1–{filteredArticles.length} of {total ?? MAX_ARTICLES_PER_FEED}
-            </p>
-          )}
-          {hasMore && !search.trim() && (
-            <div className="flex justify-center pt-2 pb-1">
-            <button
-              type="button"
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="min-h-[44px] min-w-[44px] rounded border border-black/10 dark:border-white/10 px-6 py-3 sm:py-2.5 text-sm text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] disabled:opacity-50 touch-manipulation"
-            >
-                {loadingMore ? "Loading…" : "Load more"}
-              </button>
-            </div>
-          )}
-        </>
-      )}
+                  <Link
+                    href={`/rss/feeds/${feedId}/article/${article.id}?returnTo=/rss/feeds/${feedId}`}
+                    className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-sm font-bold leading-snug text-foreground sm:text-base">
+                        <HighlightText text={article.title} search={effectiveSearch} />
+                      </h2>
+                      <p className="mt-1.5 text-xs uppercase tracking-wide text-muted sm:mt-2">
+                        {article.published_at
+                          ? new Date(article.published_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            }).toUpperCase()
+                          : ""}
+                        {article.author ? ` • ${article.author.toUpperCase()}` : ""}
+                      </p>
+                    </div>
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-24 sm:w-24">
+                      {article.thumbnail ? (
+                        <img
+                          src={article.thumbnail}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-foreground/30 text-xs">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {filteredArticles.length > 0 && (
+              <p className="text-center text-sm text-muted pt-1">
+                Showing 1–{filteredArticles.length} of {total ?? MAX_ARTICLES_PER_FEED}
+              </p>
+            )}
+            {loadingMore && (
+              <div className="pt-2 pb-1">
+                <ArticleSkeletonGrid count={4} />
+              </div>
+            )}
+            {hasMore && !effectiveSearch && !loadingMore && (
+              <div className="flex justify-center pt-2 pb-1">
+                <button
+                  type="button"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="min-h-[44px] min-w-[44px] rounded border border-border px-6 py-3 sm:py-2.5 text-sm text-foreground/70 transition-colors hover:bg-surface disabled:opacity-50 touch-manipulation"
+                >
+                  Load more
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

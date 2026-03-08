@@ -47,24 +47,30 @@ export async function GET(
   const { searchParams } = new URL(req.url);
   const limit = Math.min(MAX_LIMIT, Math.max(1, Number(searchParams.get("limit")) || DEFAULT_LIMIT));
   const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
+  const readOnly = searchParams.get("readOnly") === "true" || searchParams.get("readOnly") === "1";
+  const bookmarkedOnly = searchParams.get("bookmarkedOnly") === "true" || searchParams.get("bookmarkedOnly") === "1";
+  const readFilter = readOnly ? " AND is_read = 1" : "";
+  const bookmarkFilter = bookmarkedOnly ? " AND is_bookmarked = 1" : "";
 
   const countResult = await db.execute({
-    sql: "SELECT COUNT(*) AS total FROM articles WHERE feed_id = ?",
+    sql: `SELECT COUNT(*) AS total FROM articles WHERE feed_id = ?${readFilter}${bookmarkFilter}`,
     args: [feedId],
   });
   const total = Number((countResult.rows[0] as unknown as { total: number }).total ?? 0);
 
+  const orderBy = readOnly || bookmarkedOnly ? "published_at DESC, id DESC" : "is_read ASC, published_at DESC, id DESC";
+
   let result: { rows: Array<Record<string, unknown>> };
   try {
     result = await db.execute({
-      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at, image_url FROM articles WHERE feed_id = ? ORDER BY is_read ASC, published_at DESC, id DESC LIMIT ? OFFSET ?",
+      sql: `SELECT id, guid, url, title, content, author, published_at, is_read, is_bookmarked, created_at, image_url FROM articles WHERE feed_id = ?${readFilter}${bookmarkFilter} ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
       args: [feedId, limit, offset],
     }) as { rows: Array<Record<string, unknown>> };
   } catch (e: unknown) {
     const msg = String((e as { message?: string })?.message ?? "");
     if (!msg.includes("image_url")) throw e;
     result = await db.execute({
-      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at FROM articles WHERE feed_id = ? ORDER BY is_read ASC, published_at DESC, id DESC LIMIT ? OFFSET ?",
+      sql: `SELECT id, guid, url, title, content, author, published_at, is_read, is_bookmarked, created_at FROM articles WHERE feed_id = ?${readFilter}${bookmarkFilter} ORDER BY ${orderBy} LIMIT ? OFFSET ?`,
       args: [feedId, limit, offset],
     }) as { rows: Array<Record<string, unknown>> };
   }
@@ -83,6 +89,7 @@ export async function GET(
       author: r.author != null ? String(r.author) : null,
       published_at: r.published_at != null ? String(r.published_at) : null,
       is_read: Boolean(r.is_read),
+      is_bookmarked: Boolean(r.is_bookmarked),
       created_at: String(r.created_at ?? ""),
       thumbnail,
       excerpt: content ? excerptFromHtml(content) : null,

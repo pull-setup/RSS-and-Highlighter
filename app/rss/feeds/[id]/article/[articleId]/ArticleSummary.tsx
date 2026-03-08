@@ -42,7 +42,7 @@ export function ArticleSummary({
   const boxClass =
     "rounded-xl border border-amber-200/60 dark:border-amber-400/20 bg-amber-50/80 dark:bg-amber-950/30 overflow-hidden mb-6";
   const titleClass =
-    "text-lg font-semibold uppercase tracking-wider text-amber-700/90 dark:text-amber-300/90 mb-1.5";
+    "text-lg font-semibold uppercase tracking-wider text-foreground/90 mb-1.5";
 
   return (
     <aside className={boxClass} aria-label="Article summary">
@@ -53,13 +53,13 @@ export function ArticleSummary({
         ) : (
           <>
             {error && (
-              <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>
+              <p className="text-sm text-error mb-2">{error}</p>
             )}
             <button
               type="button"
               onClick={generate}
               disabled={loading}
-              className="text-sm text-amber-800 dark:text-amber-200 hover:underline font-medium disabled:opacity-50"
+              className="text-sm text-foreground/90 hover:underline font-medium disabled:opacity-50"
             >
               {loading ? "Generating…" : "Generate AI Summary"}
             </button>

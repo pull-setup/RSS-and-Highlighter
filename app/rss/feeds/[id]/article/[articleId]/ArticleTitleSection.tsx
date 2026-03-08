@@ -28,19 +28,19 @@ export function ArticleTitleSection({
     <StickyHeader variant="fullWidth" className="min-w-0">
       <ArticleTextZoom>
         <header>
-          <h1 className="text-base font-bold leading-tight text-white sm:text-xl md:text-2xl">
+          <h1 className="text-base font-bold leading-tight text-foreground sm:text-xl md:text-2xl">
             {title}
           </h1>
           <div className="mt-0.5 sm:mt-1 flex items-center justify-between gap-2 min-w-0">
             {metaStr ? (
-              <p className="text-xs uppercase tracking-wide text-white/80 truncate sm:text-sm">
+              <p className="text-xs uppercase tracking-wide text-muted truncate sm:text-sm">
                 {metaStr}
               </p>
             ) : (
               <span />
             )}
             {readingTimeMinutes != null && readingTimeMinutes > 0 ? (
-              <span className="text-xs uppercase tracking-wide text-white/80 shrink-0 sm:text-sm">
+              <span className="text-xs uppercase tracking-wide text-muted shrink-0 sm:text-sm">
                 {readingTimeMinutes} min read
               </span>
             ) : null}
