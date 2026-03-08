@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
 
 const PAGE_SIZE = 12;
 
@@ -45,8 +46,9 @@ export function FeedView({
         return r.json() as Promise<Article[]>;
       })
       .then((data) => {
+        const nextTotal = append ? articles.length + data.length : data.length;
         setArticles((prev) => (append ? [...prev, ...data] : data));
-        setHasMore(data.length === limit);
+        setHasMore(data.length === limit && nextTotal < MAX_ARTICLES_PER_FEED);
       })
       .catch((err: Error) => setError(err.message || "Failed to load articles"))
       .finally(() => {
@@ -219,6 +221,11 @@ export function FeedView({
               </li>
             ))}
           </ul>
+          {!search.trim() && filteredArticles.length > 0 && (
+            <p className="text-center text-sm text-foreground/60 pt-1">
+              Showing 1–{filteredArticles.length} of up to {MAX_ARTICLES_PER_FEED} · 12 per page
+            </p>
+          )}
           {hasMore && !search.trim() && (
             <div className="flex justify-center pt-2 pb-1">
               <button

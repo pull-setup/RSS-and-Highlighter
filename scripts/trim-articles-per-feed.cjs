@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+// Must match MAX_ARTICLES_PER_FEED in lib/feeds.ts
 const MAX_PER_FEED = 36;
 
 require("dotenv").config({ path: path.join(__dirname, "..", ".env.local") });

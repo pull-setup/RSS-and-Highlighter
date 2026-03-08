@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
 import Parser from "rss-parser";
 
 const parser = new Parser({
@@ -99,7 +100,7 @@ export async function PATCH(
   try {
     const feed = await parser.parseURL(url);
     const now = new Date().toISOString();
-    const items = (feed.items ?? []).slice(0, 36);
+    const items = (feed.items ?? []).slice(0, MAX_ARTICLES_PER_FEED);
     const keptGuids: string[] = [];
     for (const item of items) {
       const guid = item.guid || item.link || item.title || "";
