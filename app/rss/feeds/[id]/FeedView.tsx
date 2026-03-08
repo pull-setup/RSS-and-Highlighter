@@ -225,7 +225,7 @@ export function FeedView({
           </ul>
           {!search.trim() && filteredArticles.length > 0 && (
             <p className="text-center text-sm text-foreground/60 pt-1">
-              Showing 1–{filteredArticles.length} of {total ?? MAX_ARTICLES_PER_FEED} · 12 per page
+              Showing 1–{filteredArticles.length} of {total ?? MAX_ARTICLES_PER_FEED}
             </p>
           )}
           {hasMore && !search.trim() && (

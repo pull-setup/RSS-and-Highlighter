@@ -52,7 +52,7 @@ export async function GET(
     sql: "SELECT COUNT(*) AS total FROM articles WHERE feed_id = ?",
     args: [feedId],
   });
-  const total = Number((countResult.rows[0] as { total: number }).total ?? 0);
+  const total = Number((countResult.rows[0] as unknown as { total: number }).total ?? 0);
 
   let result: { rows: Array<Record<string, unknown>> };
   try {
