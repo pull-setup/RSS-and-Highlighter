@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
 import { db } from "@/lib/db";
 import { FeedView } from "./FeedView";
 
@@ -28,14 +27,6 @@ export default async function FeedPage({
   };
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-4">
-          <Link href="/rss" className="text-sm text-foreground/70 hover:underline">
-            ← Feeds
-          </Link>
-          <h1 className="text-2xl font-semibold">{feed.title}</h1>
-        </div>
-      </div>
       <FeedView feedId={String(feed.id)} feedTitle={feed.title} />
     </div>
   );

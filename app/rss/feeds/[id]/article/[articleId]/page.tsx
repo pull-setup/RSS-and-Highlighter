@@ -1,9 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
 import { db } from "@/lib/db";
 import { ArticleContent } from "./ArticleContent";
 import { ArticleActions } from "./ArticleActions";
+import { ImageWithExpand } from "./ImageWithExpand";
 
 export default async function ArticlePage({
   params,
@@ -27,6 +27,18 @@ export default async function ArticlePage({
   }
   if (articleRow.rows.length === 0) notFound();
   const row = articleRow.rows[0] as Record<string, unknown>;
+  const currentId = Number(row.id);
+  const ordered = await db.execute({
+    sql: "SELECT id FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC",
+    args: [feedId],
+  });
+  const ids = ordered.rows.map((r) => Number((r as Record<string, unknown>).id));
+  const idx = ids.indexOf(currentId);
+  const prevId = idx > 0 ? ids[idx - 1] : null;
+  const nextId = idx >= 0 && idx < ids.length - 1 ? ids[idx + 1] : null;
+  const prevArticleHref = prevId != null ? `/rss/feeds/${feedId}/article/${prevId}` : null;
+  const nextArticleHref = nextId != null ? `/rss/feeds/${feedId}/article/${nextId}` : null;
+
   const content = row.content != null ? String(row.content) : null;
   let image_url: string | null = (row.image_url != null && row.image_url !== "") ? String(row.image_url) : null;
   if (!image_url && content) {
@@ -45,24 +57,23 @@ export default async function ArticlePage({
   };
   return (
     <div className="flex flex-col gap-6 pb-8">
-      <div className="flex flex-wrap items-center gap-2">
-        <Link
-          href={`/rss/feeds/${feedId}`}
-          className="text-sm text-foreground/70 hover:underline"
-        >
-          ← {feed.title}
-        </Link>
-      </div>
+      <div className="flex flex-col gap-4">
+        <ArticleActions
+          articleId={article.id}
+          isRead={Boolean(article.is_read)}
+          articleUrl={article.url}
+          feedId={feedId}
+          feedTitle={feed.title}
+          prevArticleHref={prevArticleHref}
+          nextArticleHref={nextArticleHref}
+        />
       <article className="min-w-0">
         {article.image_url && (
-          <div className="relative mb-6 aspect-[2/1] w-full overflow-hidden rounded-lg bg-black/5 dark:bg-white/5">
-            <img
-              src={article.image_url}
-              alt=""
-              className="h-full w-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-          </div>
+          <ImageWithExpand
+            src={article.image_url}
+            wrapperClassName="mb-6"
+            className="aspect-[2/1] w-full object-cover rounded-lg bg-black/5 dark:bg-white/5"
+          />
         )}
         <header className="mb-6">
           <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
@@ -80,18 +91,8 @@ export default async function ArticlePage({
           </p>
         </header>
         <ArticleContent content={article.content} />
-        <footer className="mt-8 border-t border-black/10 dark:border-white/10 pt-4">
-          <a
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-foreground/70 hover:underline"
-          >
-            Open original article →
-          </a>
-        </footer>
       </article>
-      <ArticleActions articleId={article.id} isRead={Boolean(article.is_read)} />
+      </div>
     </div>
   );
 }

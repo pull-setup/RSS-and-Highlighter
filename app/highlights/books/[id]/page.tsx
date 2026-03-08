@@ -22,16 +22,18 @@ export default async function BookPage({
   const book = bookRow.rows[0] as unknown as { id: number; title: string; author: string; asin: string | null };
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-4">
-        <Link href="/highlights" className="text-sm text-foreground/70 hover:underline">
-          ← Books
-        </Link>
-        <div>
-          <h1 className="text-2xl font-semibold">{book.title}</h1>
-          <p className="text-foreground/70">{book.author}</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <Link href="/highlights" className="text-sm text-foreground/70 hover:underline">
+            ← Books
+          </Link>
+          <div>
+            <h1 className="text-2xl font-semibold">{book.title}</h1>
+            <p className="text-foreground/70">{book.author}</p>
+          </div>
         </div>
+        <HighlightsView bookId={id} />
       </div>
-      <HighlightsView bookId={id} />
     </div>
   );
 }

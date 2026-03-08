@@ -22,44 +22,34 @@ function excerptFromHtml(html: string, maxLen = 140): string {
   return plain.length <= maxLen ? plain : plain.slice(0, maxLen).trim() + "…";
 }
 
-const DEFAULT_LIMIT = 12;
-const MAX_LIMIT = 100;
-
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { id: feedId } = await params;
-  if (!feedId) {
-    return NextResponse.json({ error: "feed id required" }, { status: 400 });
-  }
-  const feedRow = await db.execute({
-    sql: "SELECT id FROM feeds WHERE id = ? AND user_id = ?",
-    args: [feedId, session.user.id],
-  });
-  if (feedRow.rows.length === 0) {
-    return NextResponse.json({ error: "Feed not found" }, { status: 404 });
-  }
   const { searchParams } = new URL(req.url);
-  const limit = Math.min(MAX_LIMIT, Math.max(1, Number(searchParams.get("limit")) || DEFAULT_LIMIT));
-  const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
+  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit")) || 12));
 
   let result: { rows: Array<Record<string, unknown>> };
   try {
     result = await db.execute({
-      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at, image_url FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?",
-      args: [feedId, limit, offset],
+      sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at, a.image_url
+            FROM articles a
+            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
+            ORDER BY a.published_at DESC, a.id DESC
+            LIMIT ?`,
+      args: [session.user.id, limit],
     }) as { rows: Array<Record<string, unknown>> };
   } catch (e: unknown) {
     const msg = String((e as { message?: string })?.message ?? "");
     if (!msg.includes("image_url")) throw e;
     result = await db.execute({
-      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?",
-      args: [feedId, limit, offset],
+      sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at
+            FROM articles a
+            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
+            ORDER BY a.published_at DESC, a.id DESC
+            LIMIT ?`,
+      args: [session.user.id, limit],
     }) as { rows: Array<Record<string, unknown>> };
   }
   const articles = result.rows.map((row) => {
@@ -70,6 +60,7 @@ export async function GET(
     const thumbnail = fromDb || (content ? firstImageFromHtml(content, baseUrl) : null);
     return {
       id: Number(r.id),
+      feed_id: Number(r.feed_id),
       guid: String(r.guid ?? ""),
       url: String(r.url ?? ""),
       title: String(r.title ?? ""),

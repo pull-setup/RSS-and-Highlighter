@@ -1,22 +1,180 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Lightbox } from "./ImageWithExpand";
+
 function stripDangerous(html: string): string {
   return html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
     .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "")
     .replace(/\s*on\w+=["'][^"']*["']/gi, "")
-    .replace(/\s*on\w+=\s*[^\s>]+/gi, "");
+    .replace(/\s*on\w+=\s*[^\s>]+/gi, "")
+    // Remove links that wrap only an image so clicks open popup, not new tab
+    .replace(/<a\s[^>]*>(\s*<img\s[^>]*>\s*)<\/a>/gi, "$1");
 }
 
+function decodeAttrs(s: string): string {
+  return s.replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#39;/g, "'");
+}
+
+function processTwitterEmbeds(html: string): string {
+  return html.replace(
+    /<div[^>]*class="twitter-embed"[^>]*data-attrs="([^"]+)"[^>]*>\s*<\/div>/gi,
+    (_, raw) => {
+      try {
+        const a = JSON.parse(decodeAttrs(raw));
+        const date = a.date
+          ? new Date(a.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+          : "";
+        const text = String(a.full_text ?? "").replace(/\n/g, "<br>");
+        const avatar = a.profile_image_url
+          ? `<img src="${a.profile_image_url}" referrerpolicy="no-referrer" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;" />`
+          : "";
+        return `<div class="tweet-card">
+          <div class="tweet-header">
+            ${avatar}
+            <div>
+              <div class="tweet-name">${a.name ?? ""}</div>
+              <div class="tweet-handle">@${a.username ?? ""}</div>
+            </div>
+            <svg class="tweet-logo" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.257 5.649 5.907-5.649zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <p class="tweet-text">${text}</p>
+          <div class="tweet-meta">
+            <span>${date}</span>
+            <span>💬 ${a.reply_count ?? 0}</span>
+            <span>🔁 ${a.retweet_count ?? 0}</span>
+            <span>❤️ ${a.like_count ?? 0}</span>
+            <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="tweet-link">View on X →</a>
+          </div>
+        </div>`;
+      } catch {
+        return "";
+      }
+    }
+  );
+}
+
+const EXPAND_ICON_SVG =
+  '<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+
 export function ArticleContent({ content }: { content: string | null }) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    const container = el.querySelector(".article-body");
+    if (!container) return;
+    const imgs = container.querySelectorAll<HTMLImageElement>("img");
+    imgs.forEach((img) => {
+      if (img.closest(".article-image-wrap")) return;
+      // Unwrap image from any ancestor <a> so clicking opens popup instead of new tab
+      const anchor = img.closest("a");
+      if (anchor) {
+        anchor.parentNode?.insertBefore(img, anchor);
+        anchor.remove();
+      }
+      const wrap = document.createElement("div");
+      wrap.className = "article-image-wrap";
+      const iconWrap = document.createElement("button");
+      iconWrap.type = "button";
+      iconWrap.className = "article-image-expand-btn";
+      iconWrap.innerHTML = EXPAND_ICON_SVG;
+      iconWrap.setAttribute("aria-label", "Full screen");
+      img.parentNode?.insertBefore(wrap, img);
+      wrap.appendChild(img);
+      wrap.appendChild(iconWrap);
+      const open = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setLightboxSrc(img.src);
+      };
+      wrap.addEventListener("click", open, true);
+      iconWrap.addEventListener("click", open, true);
+      img.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, true);
+    });
+  }, [content]);
+
   if (!content) {
     return <p className="text-foreground/70">No content.</p>;
   }
-  const safe = stripDangerous(content);
+  const processed = useMemo(
+    () => processTwitterEmbeds(stripDangerous(content)),
+    [content]
+  );
+
+  const lightbox =
+    lightboxSrc &&
+    typeof document !== "undefined" &&
+    createPortal(
+      <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />,
+      document.body
+    );
+
   return (
-    <div
-      className="article-body text-foreground [&_img]:max-w-full [&_img]:rounded-lg [&_a]:underline [&_p]:mb-3 [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-xl [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
-      dangerouslySetInnerHTML={{ __html: safe }}
-    />
+    <>
+      <style>{`
+        /* article body */
+        .article-body img { max-width: 100%; border-radius: 8px; display: block; }
+        .article-body .article-image-wrap img { pointer-events: none; cursor: pointer; }
+        .article-body .article-image-wrap { cursor: pointer; }
+        .article-body a { text-decoration: underline; }
+        .article-body p { margin-bottom: 0.75rem; }
+        .article-body h2 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: 700; }
+        .article-body h3 { margin-top: 1.25rem; margin-bottom: 0.4rem; font-size: 1.1rem; font-weight: 600; }
+        .article-body h4, .article-body h5 { margin-top: 1rem; margin-bottom: 0.3rem; font-weight: 600; }
+        .article-body ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .article-body ol { list-style: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .article-body li { margin-bottom: 0.25rem; }
+        .article-body blockquote { border-left: 3px solid rgba(128,128,128,0.4); padding-left: 1rem; margin: 1rem 0; opacity: 0.8; }
+        .article-body figure { margin: 1.25rem auto; text-align: center; }
+        .article-body figcaption { font-size: 0.82rem; opacity: 0.6; text-align: center; margin-top: 0.3rem; }
+        /* center media & embeds */
+        .article-body .tweet-card,
+        .article-body .embedded-post-wrap { margin-left: auto; margin-right: auto; }
+        /* in-article image with expand icon below */
+        .article-body .article-image-wrap { margin: 1.25rem auto; text-align: center; max-width: 100%; }
+        .article-body .article-image-wrap img { cursor: pointer; transition: opacity 0.2s; }
+        .article-body .article-image-wrap img:hover { opacity: 0.95; }
+        .article-body .article-image-expand-btn { display: inline-flex; align-items: center; justify-content: center; margin-top: 0.5rem; min-height: 44px; min-width: 44px; padding: 0.5rem; border-radius: 4px; border: 1px solid rgba(128,128,128,0.25); background: transparent; color: inherit; opacity: 0.7; cursor: pointer; transition: opacity 0.2s, background 0.2s; }
+        .article-body .article-image-expand-btn:hover { opacity: 1; background: rgba(128,128,128,0.08); }
+        @media (min-width: 640px) { .article-body .article-image-expand-btn { min-height: 0; min-width: 0; padding: 0.375rem; } }
+        .article-body .article-image-expand-btn svg { display: block; }
+        /* Substack post embed */
+        .article-body .embedded-post-wrap { border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; overflow: hidden; margin: 1.25rem auto; max-width: 520px; }
+        .article-body .embedded-post { display: block; padding: 16px; text-decoration: none !important; color: inherit; }
+        .article-body .embedded-post:hover { background: rgba(128,128,128,0.05); }
+        .article-body .embedded-post-header { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(128,128,128,0.15); }
+        .article-body .embedded-post-publication-logo { width: 28px; height: 28px; border-radius: 4px; }
+        .article-body .embedded-post-publication-name { font-size: 0.85rem; font-weight: 600; }
+        .article-body .embedded-post-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+        .article-body .embedded-post-body { font-size: 0.875rem; opacity: 0.7; line-height: 1.5; margin-bottom: 12px; }
+        .article-body .embedded-post-cta-wrapper { margin-bottom: 10px; }
+        .article-body .embedded-post-cta { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(128,128,128,0.3); }
+        .article-body .embedded-post-meta { font-size: 0.78rem; opacity: 0.55; }
+        /* Twitter card */
+        .tweet-card { border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; padding: 16px; margin: 1.25rem auto; max-width: 520px; }
+        .tweet-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tweet-name { font-weight: 700; font-size: 0.95rem; }
+        .tweet-handle { font-size: 0.82rem; opacity: 0.6; }
+        .tweet-logo { width: 18px; height: 18px; margin-left: auto; flex-shrink: 0; }
+        .tweet-text { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.55; }
+        .tweet-meta { display: flex; align-items: center; gap: 14px; font-size: 0.8rem; opacity: 0.6; flex-wrap: wrap; }
+        .tweet-link { margin-left: auto; opacity: 1; color: #1d9bf0; text-decoration: none !important; }
+      `}</style>
+      <div ref={bodyRef}>
+        <div
+          className="article-body text-foreground"
+          dangerouslySetInnerHTML={{ __html: processed }}
+        />
+      </div>
+      {lightbox}
+    </>
   );
 }
