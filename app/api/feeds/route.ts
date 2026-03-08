@@ -122,7 +122,20 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const userId = session.user.id;
+  const userId = Number(session.user.id);
+  if (!Number.isInteger(userId) || userId < 1) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const userExists = await db.execute({
+    sql: "SELECT 1 FROM users WHERE id = ?",
+    args: [userId],
+  });
+  if (userExists.rows.length === 0) {
+    return NextResponse.json(
+      { error: "User not found. Please sign in again." },
+      { status: 401 }
+    );
+  }
   const body = await req.json();
   const url = typeof body.url === "string" ? body.url.trim() : null;
   if (!url) {

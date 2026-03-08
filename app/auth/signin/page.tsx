@@ -1,26 +1,68 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function SignInPage() {
+function SignInForm() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [totp, setTotp] = useState("");
+  const [needTotp, setNeedTotp] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-    if (res?.error) {
-      setError("Invalid email or password");
-      return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, totp: needTotp ? totp : undefined }),
+      });
+      const data = await res.json();
+
+      if (data.needTotp) {
+        setNeedTotp(true);
+        setTotp("");
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setError(data.error ?? "Invalid email or password");
+        setLoading(false);
+        return;
+      }
+
+      if (!data.token) {
+        setError("Something went wrong");
+        setLoading(false);
+        return;
+      }
+
+      const signInRes = await signIn("credentials", {
+        email,
+        token: data.token,
+        redirect: false,
+      });
+
+      if (signInRes?.error) {
+        setError("Sign in failed");
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = callbackUrl;
+    } catch {
+      setError("Something went wrong");
+      setLoading(false);
     }
-    window.location.href = "/";
   }
 
   return (
@@ -33,6 +75,11 @@ export default function SignInPage() {
         {error && (
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
+        {needTotp && (
+          <p className="text-sm text-foreground/70">
+            Enter the 6-digit code from your authenticator app.
+          </p>
+        )}
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium">Email</span>
           <input
@@ -40,7 +87,8 @@ export default function SignInPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+            readOnly={needTotp}
+            className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm read-only:opacity-70"
           />
         </label>
         <label className="flex flex-col gap-1">
@@ -50,16 +98,54 @@ export default function SignInPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm"
+            readOnly={needTotp}
+            className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm read-only:opacity-70"
           />
         </label>
+        {needTotp && (
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium">Verification code</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={totp}
+              onChange={(e) => setTotp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="000000"
+              maxLength={6}
+              className="rounded border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2 text-sm font-mono tracking-widest"
+            />
+          </label>
+        )}
         <button
           type="submit"
-          className="rounded bg-foreground text-background py-2 text-sm font-medium hover:opacity-90"
+          disabled={loading}
+          className="rounded bg-foreground text-background py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
         >
-          Sign in
+          {loading ? "Signing in…" : needTotp ? "Verify" : "Sign in"}
         </button>
+        {needTotp && (
+          <button
+            type="button"
+            onClick={() => {
+              setNeedTotp(false);
+              setTotp("");
+              setError("");
+            }}
+            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          >
+            ← Back
+          </button>
+        )}
       </form>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><div className="text-foreground/60">Loading…</div></div>}>
+      <SignInForm />
+    </Suspense>
   );
 }

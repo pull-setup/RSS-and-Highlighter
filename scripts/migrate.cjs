@@ -53,6 +53,22 @@ async function migrate() {
     if (!/duplicate column|already exists/i.test(msg)) throw err;
   }
 
+  try {
+    await db.execute("ALTER TABLE users ADD COLUMN totp_secret TEXT");
+    console.log("Added totp_secret column to users");
+  } catch (err) {
+    const msg = String(err?.message ?? err?.cause?.message ?? "");
+    if (!/duplicate column|already exists/i.test(msg)) throw err;
+  }
+
+  try {
+    await db.execute("ALTER TABLE users ADD COLUMN totp_enabled INTEGER NOT NULL DEFAULT 0");
+    console.log("Added totp_enabled column to users");
+  } catch (err) {
+    const msg = String(err?.message ?? err?.cause?.message ?? "");
+    if (!/duplicate column|already exists/i.test(msg)) throw err;
+  }
+
   console.log("Migration complete");
 }
 

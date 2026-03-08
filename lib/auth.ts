@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "./db";
+import { verifySignInToken } from "./auth-token";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -8,8 +9,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        token: { label: "Token", type: "text" },
       },
       async authorize(credentials) {
+        const token = typeof credentials?.token === "string" ? credentials.token.trim() : null;
+        if (token) {
+          const payload = await verifySignInToken(token);
+          if (!payload) return null;
+          const row = await db.execute({
+            sql: "SELECT id, email, name FROM users WHERE id = ? AND email = ?",
+            args: [payload.userId, payload.email],
+          });
+          if (row.rows.length === 0) return null;
+          const r = row.rows[0] as unknown as { id: number; email: string; name: string | null };
+          return { id: String(r.id), email: r.email, name: r.name ?? "User" };
+        }
+
         const email = process.env.AUTH_USER_EMAIL;
         const password = process.env.AUTH_PASSWORD;
         if (!email || !password) return null;
@@ -21,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
         const name = process.env.AUTH_USER_NAME || "User";
         const row = await db.execute({
-          sql: "SELECT id FROM users WHERE email = ?",
+          sql: "SELECT id, totp_enabled FROM users WHERE email = ?",
           args: [email],
         });
         let userId: number;
@@ -32,7 +47,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
           userId = Number(insert.lastInsertRowid ?? 1);
         } else {
-          userId = Number((row.rows[0] as unknown as { id: number }).id);
+          const r = row.rows[0] as unknown as { id: number; totp_enabled: number };
+          userId = r.id;
+          if (r.totp_enabled) return null;
         }
         return { id: String(userId), email, name };
       },

@@ -8,26 +8,30 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node scripts/migrate.cjs",
-    "db:trim-articles": "node scripts/trim-articles-per-feed.cjs"
+    "db:trim-articles": "node scripts/trim-articles-per-feed.cjs",
+    "db:disable-totp": "node scripts/disable-totp.cjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
     "next": "^16.1.6",
     "next-auth": "^5.0.0-beta.30",
+    "otplib": "^13.3.0",
+    "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
-    "dotenv": "^16.4.5",
-    "tsx": "^4.19.2",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dotenv": "^16.4.5",
     "eslint": "^9",
     "eslint-config-next": "^16.1.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

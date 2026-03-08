@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 
 function BookIcon({ className }: { className?: string }) {
@@ -26,7 +27,19 @@ function firstWord(value: string | null | undefined): string {
 
 export function Nav() {
   const { data: session, status } = useSession();
+  const [totpEnabled, setTotpEnabled] = useState<boolean | null>(null);
   const firstName = firstWord(session?.user?.name ?? session?.user?.email ?? null);
+
+  useEffect(() => {
+    if (!session) {
+      setTotpEnabled(null);
+      return;
+    }
+    fetch("/api/auth/totp/status")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data && setTotpEnabled(data.totpEnabled))
+      .catch(() => setTotpEnabled(null));
+  }, [session]);
 
   return (
     <nav className="border-b border-black/10 dark:border-white/10 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
@@ -59,6 +72,14 @@ export function Nav() {
               <span className="text-sm text-foreground truncate max-w-[120px] sm:max-w-none">
                 Hi{firstName ? `, ${firstName} !` : " !"}
               </span>
+              {!totpEnabled && (
+                <Link
+                  href="/auth/totp"
+                  className="text-sm text-gray-500 hover:text-gray-700 hover:underline underline-offset-4 py-2 px-1 min-h-[44px] flex items-center dark:text-gray-400 dark:hover:text-gray-300"
+                >
+                  2FA
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
