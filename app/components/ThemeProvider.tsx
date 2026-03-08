@@ -2,22 +2,23 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "sepia" | "dark";
+type Theme = "light" | "dark";
 
 const ThemeContext = createContext<{ theme: Theme; setTheme: (t: Theme) => void } | null>(null);
 
 const STORAGE_KEY = "reeder-theme";
+const VALID_THEMES: Theme[] = ["light", "dark"];
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("sepia");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
     const fromDoc = document.documentElement.getAttribute("data-theme") as Theme | null;
-    if (stored && ["sepia", "dark"].includes(stored)) {
+    if (stored && VALID_THEMES.includes(stored)) {
       setThemeState(stored);
-    } else if (fromDoc && ["sepia", "dark"].includes(fromDoc)) {
+    } else if (fromDoc && VALID_THEMES.includes(fromDoc)) {
       setThemeState(fromDoc);
     }
     setMounted(true);
@@ -31,11 +32,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    localStorage.setItem(STORAGE_KEY, theme);
   }, [theme, mounted]);
 
   function setTheme(t: Theme) {
     setThemeState(t);
+    localStorage.setItem(STORAGE_KEY, t);
   }
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;

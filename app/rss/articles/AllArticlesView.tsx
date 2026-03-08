@@ -102,7 +102,7 @@ export function AllArticlesView() {
             >
               ←
             </Link>
-            <h1 className="truncate text-lg font-semibold sm:text-xl md:text-2xl">All articles</h1>
+            <h1 className="truncate text-lg font-semibold sm:text-xl md:text-2xl">All</h1>
           </div>
           <div className="relative flex-1 min-w-0 max-w-[400px] sm:max-w-[500px]">
             <label className="sr-only" htmlFor="all-articles-search">
@@ -118,7 +118,7 @@ export function AllArticlesView() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
@@ -152,7 +152,7 @@ export function AllArticlesView() {
               {filteredArticles.map((article) => (
                 <li
                   key={`${article.feed_id}-${article.id}`}
-                  className={`flex flex-col overflow-hidden rounded-xl border ${
+                  className={`list-item-hover flex flex-col overflow-hidden rounded-xl border ${
                     matchInContent(article)
                       ? "border-2 border-amber-500 dark:border-amber-400 bg-amber-50/40 dark:bg-amber-950/30"
                       : article.is_read

@@ -4,10 +4,8 @@ import { db } from "@/lib/db";
 import { ArticleContent } from "./ArticleContent";
 import { ArticleActions } from "./ArticleActions";
 import { ArticleSummary } from "./ArticleSummary";
-import { ArticleTextZoom } from "./ArticleTextZoom";
 import { ArticleTitleSection } from "./ArticleTitleSection";
 import { ArticleBottomNav } from "./ArticleBottomNav";
-import { ArticleFloatingZoomControls } from "./ArticleFloatingZoomControls";
 import { ImageWithExpand } from "./ImageWithExpand";
 
 export default async function ArticlePage({
@@ -99,7 +97,7 @@ export default async function ArticlePage({
             className="aspect-[2/1] w-full object-cover rounded-lg bg-surface"
           />
         )}
-        <ArticleTextZoom>
+        <>
           <ArticleSummary articleId={article.id} initialSummary={article.summary} />
           <ArticleContent content={article.content} />
           <ArticleBottomNav
@@ -108,9 +106,8 @@ export default async function ArticlePage({
             prevArticleTitle={prevArticleTitle}
             nextArticleTitle={nextArticleTitle}
           />
-        </ArticleTextZoom>
+        </>
       </article>
-      <ArticleFloatingZoomControls />
       </div>
     </div>
   );

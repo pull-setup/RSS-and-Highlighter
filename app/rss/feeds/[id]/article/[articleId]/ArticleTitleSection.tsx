@@ -1,7 +1,6 @@
 "use client";
 
 import { StickyHeader } from "@/app/components/StickyHeader";
-import { ArticleTextZoom } from "./ArticleTextZoom";
 
 export function ArticleTitleSection({
   title,
@@ -26,8 +25,7 @@ export function ArticleTitleSection({
 
   return (
     <StickyHeader variant="fullWidth" className="min-w-0">
-      <ArticleTextZoom>
-        <header>
+      <header>
           <h1 className="text-base font-bold leading-tight text-foreground sm:text-xl md:text-2xl">
             {title}
           </h1>
@@ -46,7 +44,6 @@ export function ArticleTitleSection({
             ) : null}
           </div>
         </header>
-      </ArticleTextZoom>
     </StickyHeader>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
+import { ChevronRightIcon } from "@/app/components/ArticleIcons";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
 
 type LatestArticle = {
@@ -41,7 +42,7 @@ export function HomeSections() {
       <div className="flex flex-col gap-4 min-h-[40vh]">
         <StickyHeader className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-xl font-semibold">Articles</h2>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <ArticleFilterCheckboxes
               bookmarkedOnly={bookmarkedOnly}
               readOnly={readOnly}
@@ -50,9 +51,10 @@ export function HomeSections() {
             />
             <Link
               href="/rss/articles"
-              className="text-sm text-muted hover:text-foreground hover:underline"
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-border px-2.5 py-2.5 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1.5"
+              aria-label="All articles"
             >
-              All articles →
+              <ChevronRightIcon className="h-5 w-5" />
             </Link>
           </div>
         </StickyHeader>
@@ -71,7 +73,7 @@ export function HomeSections() {
             {articles.map((article) => (
               <li
                 key={`${article.feed_id}-${article.id}`}
-                className={`flex flex-col overflow-hidden rounded-xl border ${
+                className={`list-item-hover flex flex-col overflow-hidden rounded-xl border ${
                   article.is_read
                     ? "border-border bg-surface"
                     : "border-border"
@@ -126,9 +128,10 @@ export function HomeSections() {
           <h2 className="text-xl font-semibold">Highlights</h2>
           <Link
             href="/highlights"
-            className="text-sm text-muted hover:text-foreground hover:underline"
+            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-border px-2.5 py-2.5 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1.5"
+            aria-label="All highlights"
           >
-            All highlights →
+            <ChevronRightIcon className="h-5 w-5" />
           </Link>
         </StickyHeader>
         <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-border border-dashed bg-surface py-12">

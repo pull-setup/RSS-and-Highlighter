@@ -44,7 +44,7 @@ export function BooksList() {
         <li key={book.id}>
           <Link
             href={`/highlights/books/${book.id}`}
-            className="block rounded-lg border border-border p-4 hover:bg-surface"
+            className="list-item-hover block rounded-lg border border-border p-4 hover:bg-surface"
           >
             <span className="font-medium">{book.title}</span>
             <p className="text-sm text-foreground/70 mt-1">{book.author}</p>

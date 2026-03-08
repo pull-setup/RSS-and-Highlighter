@@ -68,7 +68,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
           <li key={feed.id}>
             <Link
               href={`/rss/feeds/${feed.id}`}
-              className="flex min-h-[72px] items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-surface sm:min-h-0 sm:gap-4 sm:p-4"
+              className="list-item-hover flex min-h-[72px] items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-surface sm:min-h-0 sm:gap-4 sm:p-4"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-muted sm:h-9 sm:w-9">
                 {index + 1}
@@ -102,7 +102,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
               </div>
               <span className="shrink-0 text-muted" aria-hidden>
                 <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </span>
             </Link>

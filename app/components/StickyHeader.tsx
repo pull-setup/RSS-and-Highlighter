@@ -6,9 +6,9 @@ import { useTheme } from "./ThemeProvider";
 const baseStyle = (v: string) =>
   `sticky top-2 py-3 transition-all duration-300 ease-out ${v === "fullWidth" ? "z-40" : "z-30"}`;
 
-function getStuckStyle(stuck: boolean, theme: "sepia" | "dark") {
+function getStuckStyle(stuck: boolean, theme: "light" | "dark") {
   if (!stuck) return "bg-transparent backdrop-blur-none rounded-none border border-transparent";
-  if (theme === "sepia") return "bg-amber-50/70 backdrop-blur-md rounded-3xl border border-amber-200/50";
+  if (theme === "light") return "bg-white/80 backdrop-blur-md rounded-3xl border border-zinc-200/80";
   return "bg-zinc-900/70 backdrop-blur-md rounded-3xl border border-zinc-600/40";
 }
 

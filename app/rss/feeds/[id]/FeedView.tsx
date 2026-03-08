@@ -145,7 +145,7 @@ export function FeedView({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
@@ -162,7 +162,7 @@ export function FeedView({
               type="button"
               onClick={refresh}
               disabled={refreshing}
-              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-accent transition-colors hover:bg-accent/10 disabled:opacity-50"
+              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full p-1.5 text-accent transition-colors hover:bg-accent/10 disabled:opacity-50"
               aria-label={refreshing ? "Refreshing feed" : "Refresh feed"}
             >
               <svg
@@ -175,7 +175,7 @@ export function FeedView({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
@@ -194,7 +194,7 @@ export function FeedView({
               {filteredArticles.map((article) => (
                 <li
                   key={article.id}
-                  className={`flex flex-col overflow-hidden rounded-xl border ${
+                  className={`list-item-hover flex flex-col overflow-hidden rounded-xl border ${
                     matchInContent(article)
                       ? "border-2 border-amber-500 dark:border-amber-400 bg-amber-50/40 dark:bg-amber-950/30"
                       : article.is_read

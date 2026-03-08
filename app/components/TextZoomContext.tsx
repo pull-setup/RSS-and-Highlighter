@@ -72,5 +72,19 @@ export function TextZoomProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function TextZoomContent({ children }: { children: React.ReactNode }) {
-  return <div className="text-zoom-content">{children}</div>;
+  const ctx = useContext(TextZoomContext);
+  const zoom = ctx?.zoom ?? DEFAULT;
+  const scale = zoom / 100;
+  return (
+    <div
+      className="text-zoom-content min-w-0"
+      style={
+        scale !== 1
+          ? ({ zoom: scale } as React.CSSProperties)
+          : undefined
+      }
+    >
+      {children}
+    </div>
+  );
 }

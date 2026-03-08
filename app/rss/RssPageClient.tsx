@@ -27,9 +27,9 @@ export function RssPageClient() {
           <Link
             href="/rss/new"
             aria-label="Add feed"
-            className="shrink-0 flex min-h-[44px] min-w-[44px] items-center justify-center rounded border border-black/20 text-foreground hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.06] touch-manipulation"
+            className="shrink-0 flex min-h-[44px] min-w-[44px] items-center justify-center rounded border border-black/20 p-1.5 text-foreground hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.06] touch-manipulation"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
           </Link>

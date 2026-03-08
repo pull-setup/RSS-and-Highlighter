@@ -23,12 +23,12 @@ function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
       <button
         type="button"
         onClick={onClose}
-        className="absolute z-10 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-black/40 text-white transition-colors hover:bg-white/10 sm:right-4 sm:top-4"
+        className="absolute z-10 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/20 bg-black/40 p-1.5 text-white transition-colors hover:bg-white/10 sm:right-4 sm:top-4"
         style={{ top: "max(0.75rem, env(safe-area-inset-top, 0.75rem))", right: "max(0.75rem, env(safe-area-inset-right, 0.75rem))" }}
         aria-label="Close"
       >
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       <div className="flex min-h-0 flex-1 items-center justify-center p-4">

@@ -28,7 +28,7 @@ export function ArticleBottomNav({
           aria-label={prevArticleTitle ? `Previous article: ${prevArticleTitle}` : "Previous article"}
           className="flex items-center gap-2 min-w-0 max-w-[50%]"
         >
-          <span className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
+          <span className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 p-1.5 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
             <ChevronLeftIcon className="h-5 w-5" />
           </span>
           {prevArticleTitle ? (
@@ -51,7 +51,7 @@ export function ArticleBottomNav({
               {nextArticleTitle}
             </span>
           ) : null}
-          <span className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
+          <span className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 p-1.5 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
             <ChevronRightIcon className="h-5 w-5" />
           </span>
         </Link>

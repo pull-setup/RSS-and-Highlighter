@@ -61,7 +61,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
           {highlights.map((h) => (
             <li
               key={h.id}
-              className="rounded-lg border border-border p-2"
+              className="list-item-hover rounded-lg border border-border p-2"
             >
               <p className="text-foreground whitespace-pre-wrap">{h.content}</p>
               {(h.location || h.note) && (
