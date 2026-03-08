@@ -7,15 +7,9 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">RSS & Highlights</h1>
-        <p className="text-sm text-foreground/70">
-          Personal knowledge hub: read RSS feeds and browse Kindle highlights by book.
-        </p>
-      </div>
       {!session ? (
         <p className="text-sm text-foreground/70">
-          <Link href="/auth/signin" className="underline underline-offset-4">
+          <Link href="/auth/signin" className="text-gray-500 underline underline-offset-4 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
             Sign in
           </Link>{" "}
           to add feeds, read articles, and view your highlights.

@@ -3,6 +3,9 @@ import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ArticleContent } from "./ArticleContent";
 import { ArticleActions } from "./ArticleActions";
+import { ArticleSummary } from "./ArticleSummary";
+import { ArticleTextZoom } from "./ArticleTextZoom";
+import { ArticleTitleSection } from "./ArticleTitleSection";
 import { ImageWithExpand } from "./ImageWithExpand";
 
 export default async function ArticlePage({
@@ -21,9 +24,9 @@ export default async function ArticlePage({
   const feed = feedRow.rows[0] as unknown as { id: number; title: string };
   let articleRow: { rows: Array<Record<string, unknown>> };
   try {
-    articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, image_url FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
+    articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, image_url, summary FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
   } catch {
-    articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
+    articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, image_url FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };
   }
   if (articleRow.rows.length === 0) notFound();
   const row = articleRow.rows[0] as Record<string, unknown>;
@@ -45,6 +48,7 @@ export default async function ArticlePage({
     const firstImg = content.match(/<img[^>]+?(?:src|data-src)=["']([^"']+)["']/i)?.[1]?.trim();
     if (firstImg) image_url = firstImg.startsWith("http") ? firstImg : (() => { try { return new URL(firstImg, String(row.url)).href; } catch { return null; } })();
   }
+  const summary = row.summary != null && String(row.summary).trim() !== "" ? String(row.summary) : null;
   const article = {
     id: Number(row.id),
     url: String(row.url ?? ""),
@@ -54,6 +58,7 @@ export default async function ArticlePage({
     published_at: row.published_at != null ? String(row.published_at) : null,
     is_read: Number(row.is_read),
     image_url,
+    summary,
   };
   return (
     <div className="flex flex-col gap-6 pb-8">
@@ -68,6 +73,13 @@ export default async function ArticlePage({
           nextArticleHref={nextArticleHref}
         />
       <article className="min-w-0">
+        <ArticleTitleSection
+          title={article.title}
+          publishedAt={article.published_at}
+          author={article.author}
+          prevArticleHref={prevArticleHref}
+          nextArticleHref={nextArticleHref}
+        />
         {article.image_url && (
           <ImageWithExpand
             src={article.image_url}
@@ -75,22 +87,10 @@ export default async function ArticlePage({
             className="aspect-[2/1] w-full object-cover rounded-lg bg-black/5 dark:bg-white/5"
           />
         )}
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
-            {article.title}
-          </h1>
-          <p className="mt-2 text-sm uppercase tracking-wide text-foreground/60">
-            {article.published_at
-              ? new Date(article.published_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                }).toUpperCase()
-              : ""}
-            {article.author ? ` • ${article.author.toUpperCase()}` : ""}
-          </p>
-        </header>
-        <ArticleContent content={article.content} />
+        <ArticleTextZoom>
+          <ArticleSummary articleId={article.id} initialSummary={article.summary} />
+          <ArticleContent content={article.content} />
+        </ArticleTextZoom>
       </article>
       </div>
     </div>

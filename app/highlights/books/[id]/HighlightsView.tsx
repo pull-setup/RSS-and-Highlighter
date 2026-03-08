@@ -39,7 +39,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
         <button
           type="button"
           onClick={() => setShowForm((s) => !s)}
-          className="text-sm text-foreground/70 hover:underline"
+          className="text-sm text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-300"
         >
           {showForm ? "Cancel" : "Add highlight"}
         </button>
@@ -60,7 +60,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
           {highlights.map((h) => (
             <li
               key={h.id}
-              className="rounded-lg border border-black/10 dark:border-white/10 p-4"
+              className="rounded-lg border border-black/10 dark:border-white/10 p-2"
             >
               <p className="text-foreground whitespace-pre-wrap">{h.content}</p>
               {(h.location || h.note) && (

@@ -30,12 +30,12 @@ export function HomeSections() {
       {/* 1st half: RSS – latest 8 articles */}
       <div className="flex flex-col gap-4 min-h-[40vh]">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">RSS</h2>
+          <h2 className="text-xl font-semibold">Articles</h2>
           <Link
-            href="/rss"
-            className="text-sm text-foreground/70 hover:text-foreground hover:underline"
+            href="/rss/articles"
+            className="text-sm text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-300"
           >
-            All feeds →
+            All articles →
           </Link>
         </div>
         {loading ? (
@@ -43,7 +43,7 @@ export function HomeSections() {
         ) : articles.length === 0 ? (
           <p className="text-foreground/60 text-sm">
             No articles yet.{" "}
-            <Link href="/rss/new" className="underline underline-offset-4">
+            <Link href="/rss/new" className="text-gray-500 underline underline-offset-4 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
               Add a feed
             </Link>
             .
@@ -61,10 +61,10 @@ export function HomeSections() {
               >
                 <Link
                   href={`/rss/feeds/${article.feed_id}/article/${article.id}`}
-                  className="flex min-h-0 flex-1 flex-row gap-3 p-3 sm:gap-4 sm:p-4"
+                  className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-bold leading-snug text-foreground sm:text-lg line-clamp-2">
+                    <h3 className="text-sm font-bold leading-snug text-foreground sm:text-base line-clamp-2">
                       {article.title}
                     </h3>
                     <p className="mt-1.5 text-xs uppercase tracking-wide text-foreground/60 sm:mt-2">
@@ -100,13 +100,15 @@ export function HomeSections() {
         )}
       </div>
 
-      {/* 2nd half: Kindle Highlights – placeholder */}
+      <div className="my-8 border-t border-black/10 dark:border-white/10" role="separator" />
+
+      {/* 2nd half: Highlights – placeholder */}
       <div className="flex flex-col gap-4 min-h-[40vh]">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Kindle Highlights</h2>
+          <h2 className="text-xl font-semibold">Highlights</h2>
           <Link
             href="/highlights"
-            className="text-sm text-foreground/70 hover:text-foreground hover:underline"
+            className="text-sm text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-300"
           >
             All highlights →
           </Link>
@@ -115,7 +117,7 @@ export function HomeSections() {
           <p className="text-foreground/60 text-sm">Highlights will appear here.</p>
           <Link
             href="/highlights"
-            className="mt-2 text-sm text-foreground/70 underline underline-offset-4 hover:text-foreground"
+            className="mt-2 text-sm text-gray-500 underline underline-offset-4 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
           >
             Go to Highlights
           </Link>

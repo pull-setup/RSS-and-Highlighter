@@ -49,7 +49,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
     return (
       <p className="text-foreground/70">
         No feeds yet.{" "}
-        <Link href="/rss/new" className="underline underline-offset-4">
+        <Link href="/rss/new" className="text-gray-500 underline underline-offset-4 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
           Add one
         </Link>
         .

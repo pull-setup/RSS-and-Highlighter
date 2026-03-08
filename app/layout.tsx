@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
+import { TextZoomProvider, TextZoomContent } from "./components/TextZoomContext";
 import { Nav } from "./components/Nav";
 
 const geistSans = localFont({
@@ -20,6 +21,12 @@ export const metadata: Metadata = {
   description: "Personal knowledge hub: RSS reader and Kindle highlights",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,10 +38,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
-          <Nav />
-          <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
-            {children}
-          </main>
+          <TextZoomProvider>
+            <Nav />
+            <main className="flex-1 max-w-4xl w-full mx-auto min-w-0 px-4 py-6 sm:px-6 md:px-8 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
+              <TextZoomContent>{children}</TextZoomContent>
+            </main>
+          </TextZoomProvider>
         </Providers>
       </body>
     </html>

@@ -45,6 +45,14 @@ async function migrate() {
     if (!/duplicate column|already exists/i.test(msg)) throw err;
   }
 
+  try {
+    await db.execute("ALTER TABLE articles ADD COLUMN summary TEXT");
+    console.log("Added summary column to articles");
+  } catch (err) {
+    const msg = String(err?.message ?? err?.cause?.message ?? "");
+    if (!/duplicate column|already exists/i.test(msg)) throw err;
+  }
+
   console.log("Migration complete");
 }
 
