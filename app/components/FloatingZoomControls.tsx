@@ -20,7 +20,7 @@ function MoonIcon({ className }: { className?: string }) {
   );
 }
 
-const btnClass = "flex min-h-[36px] min-w-[36px] sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 items-center justify-center p-1 text-white hover:bg-white/10 transition-colors touch-manipulation";
+const btnClass = "flex min-h-[40px] min-w-[40px] items-center justify-center p-1 text-white hover:bg-white/10 transition-colors touch-manipulation";
 
 export function FloatingZoomControls() {
   const [scrolled, setScrolled] = useState(false);

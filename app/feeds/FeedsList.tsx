@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { EmptyState } from "@/app/components/EmptyState";
 
 type Feed = {
   id: number;
@@ -47,13 +48,10 @@ export function FeedsList({ search = "" }: { search?: string }) {
   if (error) return <p className="text-error">{error}</p>;
   if (feeds.length === 0) {
     return (
-      <p className="text-foreground/70">
-        No feeds yet.{" "}
-        <Link href="/feeds/new" className="text-muted underline underline-offset-4 hover:text-foreground">
-          Add one
-        </Link>
-        .
-      </p>
+      <EmptyState
+        message={search.trim() ? "No feeds match your search." : "No feeds yet."}
+        action={search.trim() ? undefined : { label: "Add one", href: "/feeds/new" }}
+      />
     );
   }
 
@@ -109,9 +107,6 @@ export function FeedsList({ search = "" }: { search?: string }) {
           </li>
         );
       })}
-      {filtered.length === 0 && (
-        <li className="col-span-full text-muted text-sm">No feeds match your search.</li>
-      )}
     </ul>
   );
 }

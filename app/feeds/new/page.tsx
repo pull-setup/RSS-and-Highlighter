@@ -17,7 +17,7 @@ export default async function NewFeedPage() {
           <div className="flex items-center">
             <Link
               href="/feeds"
-              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+              className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
               aria-label="Back to Feeds"
             >
               <ChevronLeftIcon className="h-4 w-4" />

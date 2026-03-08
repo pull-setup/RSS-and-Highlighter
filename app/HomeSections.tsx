@@ -6,6 +6,7 @@ import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
 import { ChevronRightIcon } from "@/app/components/ArticleIcons";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { EmptyState } from "@/app/components/EmptyState";
 
 type LatestArticle = {
   id: number;
@@ -51,7 +52,7 @@ export function HomeSections() {
             />
             <Link
               href="/feeds/articles"
-              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+              className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
               aria-label="All articles"
             >
               <ChevronRightIcon className="h-4 w-4" />
@@ -61,13 +62,10 @@ export function HomeSections() {
         {loading ? (
           <ArticleSkeletonGrid count={12} />
         ) : articles.length === 0 ? (
-          <p className="text-foreground/60 text-sm">
-            No articles yet.{" "}
-            <Link href="/feeds/new" className="text-muted underline underline-offset-4 hover:text-foreground">
-              Add a feed
-            </Link>
-            .
-          </p>
+          <EmptyState
+            message="No articles yet."
+            action={{ label: "Add a feed", href: "/feeds/new" }}
+          />
         ) : (
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {articles.map((article) => (
@@ -128,21 +126,17 @@ export function HomeSections() {
           <h2 className="text-lg font-semibold">Highlights</h2>
           <Link
             href="/highlights"
-            className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+            className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
             aria-label="All highlights"
           >
             <ChevronRightIcon className="h-4 w-4" />
           </Link>
         </StickyHeader>
-        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-border border-dashed bg-surface py-8">
-          <p className="text-foreground/60 text-sm">Highlights will appear here.</p>
-          <Link
-            href="/highlights"
-            className="mt-2 text-sm text-muted underline underline-offset-4 hover:text-foreground"
-          >
-            Go to Highlights
-          </Link>
-        </div>
+        <EmptyState
+          message="Highlights will appear here."
+          action={{ label: "Go to Highlights", href: "/highlights" }}
+          className="flex-1"
+        />
       </div>
     </div>
   );

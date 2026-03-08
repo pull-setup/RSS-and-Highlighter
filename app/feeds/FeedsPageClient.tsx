@@ -16,7 +16,7 @@ export function FeedsPageClient() {
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+            className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
             aria-label="Back to Home"
           >
             <ChevronLeftIcon className="h-4 w-4" />

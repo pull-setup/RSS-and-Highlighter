@@ -6,6 +6,7 @@ import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
 
 const PAGE_SIZE = 36;
@@ -99,12 +100,12 @@ export function AllArticlesView() {
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/"
-              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+              className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
               aria-label="Back to Home"
             >
               <ChevronLeftIcon className="h-4 w-4" />
             </Link>
-            <div className="relative flex-1 min-w-0 max-w-[400px] sm:max-w-[500px]">
+            <div className="relative flex-1 min-w-0">
               <label className="sr-only" htmlFor="all-articles-search">
                 Search articles
               </label>
@@ -144,9 +145,12 @@ export function AllArticlesView() {
         {loading ? (
           <ArticleSkeletonGrid count={PAGE_SIZE} />
         ) : articles.length === 0 ? (
-          <p className="text-foreground/70">No articles yet. Add feeds to get started.</p>
+          <EmptyState
+            message="No articles yet."
+            action={{ label: "Add feeds to get started", href: "/feeds/new" }}
+          />
         ) : filteredArticles.length === 0 ? (
-          <p className="text-foreground/60 text-sm">No articles match your search.</p>
+          <EmptyState message="No articles match your search or filters." />
         ) : (
           <>
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">

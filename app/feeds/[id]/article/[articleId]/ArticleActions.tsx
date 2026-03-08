@@ -73,7 +73,7 @@ export function ArticleActions({
     <div className="flex flex-row items-center justify-between gap-2 min-w-0">
       <Link
         href={backHref}
-        className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+        className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
         aria-label="Back"
       >
         <ChevronLeftIcon className="h-4 w-4" />
@@ -83,7 +83,7 @@ export function ArticleActions({
           type="button"
           onClick={toggleBookmark}
           aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
-          className={`flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border p-1.5 transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
+          className={`flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border p-1.5 transition-colors ${
             bookmarked
               ? "border-amber-300/50 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:border-amber-400/30 dark:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/30"
               : "border-border text-foreground/50 hover:bg-surface"
@@ -95,7 +95,7 @@ export function ArticleActions({
           type="button"
           onClick={toggle}
           aria-label={read ? "Mark unread" : "Mark read"}
-          className={`flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border p-1.5 transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
+          className={`flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border p-1.5 transition-colors ${
             read
               ? "border-emerald-300/50 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:border-emerald-400/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:hover:bg-emerald-500/30"
               : "border-border text-foreground/50 hover:bg-surface"
@@ -108,7 +108,7 @@ export function ArticleActions({
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Open original article"
-          className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border p-1.5 text-foreground/70 transition-colors hover:bg-surface sm:min-h-0 sm:min-w-0 sm:py-1.5"
+          className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border p-1.5 text-foreground/70 transition-colors hover:bg-surface"
         >
           <ExternalLinkIcon className="h-4 w-4" />
         </a>

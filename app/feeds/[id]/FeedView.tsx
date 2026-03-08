@@ -5,6 +5,7 @@ import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
@@ -119,7 +120,7 @@ export function FeedView({
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/feeds"
-              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+              className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
               aria-label="Back to Feeds"
             >
               <ChevronLeftIcon className="h-4 w-4" />
@@ -186,9 +187,9 @@ export function FeedView({
         {loading ? (
           <ArticleSkeletonGrid count={PAGE_SIZE} />
         ) : articles.length === 0 ? (
-          <p className="text-foreground/70">No articles. Try refreshing.</p>
+          <EmptyState message="No articles. Try refreshing the feed." />
         ) : filteredArticles.length === 0 ? (
-          <p className="text-foreground/60 text-sm">No articles match your search.</p>
+          <EmptyState message="No articles match your search or filters." />
         ) : (
           <>
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { EmptyState } from "@/app/components/EmptyState";
 
 type Book = {
   id: number;
@@ -28,13 +29,10 @@ export function BooksList() {
   if (error) return <p className="text-error">{error}</p>;
   if (books.length === 0) {
     return (
-      <p className="text-foreground/70">
-        No books yet.{" "}
-        <Link href="/highlights/new" className="underline underline-offset-4">
-          Add one
-        </Link>
-        .
-      </p>
+      <EmptyState
+        message="No books yet."
+        action={{ label: "Add one", href: "/highlights/new" }}
+      />
     );
   }
 

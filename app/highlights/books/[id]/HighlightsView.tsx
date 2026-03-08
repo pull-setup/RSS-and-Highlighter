@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { StickyHeader } from "@/app/components/StickyHeader";
+import { EmptyState } from "@/app/components/EmptyState";
 
 type Highlight = {
   id: number;
@@ -57,7 +58,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
         />
       )}
       {highlights.length === 0 && !showForm ? (
-        <p className="text-foreground/70">No highlights yet.</p>
+        <EmptyState message="No highlights yet." />
       ) : (
         <ul className="flex flex-col gap-4">
           {highlights.map((h) => (
