@@ -1,14 +1,13 @@
-# Build & run steps (manual)
+# Build & run (local)
 
 ## Prerequisites
 
 - Node.js 18+
-- A [Turso](https://turso.tech) account (or local libSQL for dev)
+- [Turso](https://turso.tech) account (or local libSQL)
 
-## 1. Install dependencies
+## 1. Install
 
 ```bash
-cd rss-n-highlighter
 npm install
 ```
 
@@ -38,9 +37,9 @@ Edit `.env.local`:
 | `AUTH_PASSWORD` | Yes | Password you use to sign in |
 | `AUTH_USER_NAME` | No | Display name (default: "User") |
 
-## 4. Run database migration
+## 4. Migrate DB
 
-Creates/updates tables (users, feeds, articles, books, highlights):
+Creates/updates tables (users, feeds, articles, books, highlights). Uses `TURSO_*` from `.env.local`:
 
 ```bash
 npm run db:migrate
@@ -85,5 +84,5 @@ npm run build
 
 ## Features
 
-- **RSS**: Add feed URL → articles are fetched and stored; mark read/unread; refresh feed to get new items.
-- **Highlights**: Add books (title, author), then add highlights per book. View all highlights grouped by book.
+- **RSS:** Add feed URL (e.g. Substack site URL); articles open in-app; mark read/unread; refresh to fetch new items. Article images from feed enclosure or first image in content.
+- **Highlights:** Add books (title, author, optional ASIN), then add highlights per book. View by book.

@@ -18,17 +18,32 @@
   ```
 - For **production** (e.g. Vercel), set the same variables in the host’s “Environment Variables” UI; never put production secrets in the repo.
 
-## 1. Push code to GitHub
+## 1. Push to GitHub
 
-Create a repo and push your project (if not already):
+Create a repo on GitHub (e.g. `RSS-and-Highlighter` or `rss-n-highlighter`), then:
 
 ```bash
 git init
 git add .
+git status   # ensure .env.local is not listed
 git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/rss-n-highlighter.git
+git remote add origin https://github.com/YOUR_USERNAME/YOUR-REPO-NAME.git
 git push -u origin main
 ```
+
+If you use SSH and get "Permission denied (publickey)", either add your SSH key in GitHub or switch to HTTPS:
+
+```bash
+git remote set-url origin https://github.com/YOUR_USERNAME/YOUR-REPO-NAME.git
+```
+
+If you have GPG commit signing enabled but don’t want it for this repo:
+
+```bash
+git config commit.gpgsign false
+```
+
+If the remote already has a README/license, either pull first (`git pull origin main --allow-unrelated-histories`) or force push (`git push -u origin main --force`) if you’re fine replacing remote.
 
 ## 2. Create a production Turso database
 
@@ -40,7 +55,7 @@ In [Turso dashboard](https://turso.tech/app): create a **new** database for prod
 ## 3. Deploy on Vercel
 
 1. Go to [vercel.com](https://vercel.com) and sign in (GitHub).
-2. **Add New** → **Project** → import your `rss-n-highlighter` repo.
+2. **Add New** → **Project** → import your GitHub repo.
 3. Leave **Framework Preset** as Next.js and **Root Directory** as `.`
 4. Before deploying, open **Environment Variables** and add:
 
@@ -62,7 +77,6 @@ In [Turso dashboard](https://turso.tech/app): create a **new** database for prod
 Vercel doesn’t run the migrate script. Run it once from your machine against the **production** Turso DB:
 
 ```bash
-cd rss-n-highlighter
 TURSO_DATABASE_URL="libsql://your-PROD-db.turso.io" TURSO_AUTH_TOKEN="your-PROD-token" npm run db:migrate
 ```
 
@@ -84,6 +98,6 @@ Open `https://your-project.vercel.app`, sign in with `AUTH_USER_EMAIL` / `AUTH_P
 
 **Summary**
 
-- Repo on GitHub → Vercel “Add Project” → add env vars → Deploy.
-- Run `node scripts/migrate.cjs` once with production `TURSO_*` so the prod DB has tables.
-- Optionally set `NEXTAUTH_URL` if redirects fail.
+- Push to GitHub → Vercel “Add Project” → set env vars → Deploy.
+- Run `npm run db:migrate` once with production `TURSO_*` so the prod DB has tables.
+- Set `NEXTAUTH_URL` in Vercel only if sign-in redirects fail.
