@@ -2,29 +2,29 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
-import { AddBookForm } from "./AddBookForm";
+import { AddFeedForm } from "./AddFeedForm";
 
-export default async function NewBookPage() {
+export default async function NewFeedPage() {
   const session = await auth();
   if (!session) {
-    redirect("/auth/signin?callbackUrl=/highlights/new");
+    redirect("/auth/signin?callbackUrl=/feeds/new");
   }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold text-center">Add book</h1>
+          <h1 className="text-2xl font-semibold text-center">Add feed</h1>
           <div className="flex items-center">
             <Link
-              href="/highlights"
+              href="/feeds"
               className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
-              aria-label="Back to Books"
+              aria-label="Back to Feeds"
             >
               <ChevronLeftIcon className="h-4 w-4" />
             </Link>
           </div>
         </div>
-        <AddBookForm />
+        <AddFeedForm />
       </div>
     </div>
   );

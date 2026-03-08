@@ -67,7 +67,7 @@ export async function GET(
     );
   }
 
-  const prompt = `Write a summary of this article in 120–150 words. Cover the main points and conclusions. Use clear, neutral language.\n\nTitle: ${title}\n\nContent: ${text}`;
+  const prompt = `Write a summary of this article in 120–150 words. Cover the main points and conclusions. Use clear, neutral language. Output only the summary text—no intro phrases like "Here is a summary of the article in 120-150 words."\n\nTitle: ${title}\n\nContent: ${text}`;
 
   try {
     const res = await fetch(GROQ_URL, {
@@ -109,7 +109,8 @@ export async function GET(
       );
     }
     const raw = data.choices?.[0]?.message?.content;
-    const summary = typeof raw === "string" ? raw.trim() : "";
+    let summary = typeof raw === "string" ? raw.trim() : "";
+    summary = summary.replace(/^Here is a summary of the article in 120-150 words:\s*/i, "").trim();
     if (!summary) {
       return NextResponse.json(
         { error: "Empty summary from model" },

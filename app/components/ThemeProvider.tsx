@@ -6,7 +6,7 @@ type Theme = "light" | "dark";
 
 const ThemeContext = createContext<{ theme: Theme; setTheme: (t: Theme) => void } | null>(null);
 
-const STORAGE_KEY = "reeder-theme";
+const STORAGE_KEY = "reedsync-theme";
 const VALID_THEMES: Theme[] = ["light", "dark"];
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

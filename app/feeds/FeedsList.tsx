@@ -49,7 +49,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
     return (
       <p className="text-foreground/70">
         No feeds yet.{" "}
-        <Link href="/rss/new" className="text-muted underline underline-offset-4 hover:text-foreground">
+        <Link href="/feeds/new" className="text-muted underline underline-offset-4 hover:text-foreground">
           Add one
         </Link>
         .
@@ -58,7 +58,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
   }
 
   return (
-    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+    <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
       {filtered.map((feed, index) => {
         const favicon = feedFaviconUrl(feed);
         const faviconFailed = failedFavicons.has(feed.id);
@@ -67,13 +67,13 @@ export function FeedsList({ search = "" }: { search?: string }) {
         return (
           <li key={feed.id}>
             <Link
-              href={`/rss/feeds/${feed.id}`}
-              className="list-item-hover flex min-h-[72px] items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-surface sm:min-h-0 sm:gap-4 sm:p-4"
+              href={`/feeds/${feed.id}`}
+              className="list-item-hover flex min-h-[64px] items-center gap-2.5 rounded-lg border border-border p-4 transition-colors hover:bg-surface sm:min-h-0 sm:gap-3 sm:p-4"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center text-sm font-semibold text-muted sm:h-9 sm:w-9">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center text-xs font-semibold text-muted sm:h-8 sm:w-8">
                 {index + 1}
               </span>
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface sm:h-14 sm:w-14">
+              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface sm:h-11 sm:w-11">
                 {showFavicon ? (
                   <img
                     src={favicon}

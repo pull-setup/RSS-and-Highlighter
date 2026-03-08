@@ -28,8 +28,8 @@ export function ArticleBottomNav({
           aria-label={prevArticleTitle ? `Previous article: ${prevArticleTitle}` : "Previous article"}
           className="flex items-center gap-2 min-w-0 max-w-[50%]"
         >
-          <span className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 p-1.5 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
-            <ChevronLeftIcon className="h-5 w-5" />
+          <span className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-black/10 p-1.5 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
+            <ChevronLeftIcon className="h-4 w-4" />
           </span>
           {prevArticleTitle ? (
             <span className="text-sm text-foreground/70 text-left line-clamp-2 break-words">
@@ -38,7 +38,7 @@ export function ArticleBottomNav({
           ) : null}
         </Link>
       ) : (
-        <span className="h-11 w-11 shrink-0" aria-hidden />
+        <span className="h-9 w-9 shrink-0" aria-hidden />
       )}
       {nextArticleHref ? (
         <Link
@@ -51,12 +51,12 @@ export function ArticleBottomNav({
               {nextArticleTitle}
             </span>
           ) : null}
-          <span className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 p-1.5 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
-            <ChevronRightIcon className="h-5 w-5" />
+          <span className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-black/10 p-1.5 dark:border-white/10 text-foreground/70 transition-colors hover:bg-black/[.04] dark:hover:bg-white/[.06] active:opacity-80 touch-manipulation">
+            <ChevronRightIcon className="h-4 w-4" />
           </span>
         </Link>
       ) : (
-        <span className="h-11 w-11 shrink-0 ml-auto" aria-hidden />
+        <span className="h-9 w-9 shrink-0 ml-auto" aria-hidden />
       )}
     </nav>
   );

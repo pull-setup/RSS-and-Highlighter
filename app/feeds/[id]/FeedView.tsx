@@ -6,6 +6,7 @@ import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
 import { HighlightText } from "@/app/components/HighlightText";
+import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
 
 const PAGE_SIZE = 36;
@@ -111,26 +112,18 @@ export function FeedView({
   if (error) return <p className="text-error">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <StickyHeader className="flex flex-col gap-3 sm:flex-row sm:min-h-[44px] sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        <StickyHeader className="flex flex-col gap-2">
+          <h1 className="truncate text-base font-semibold sm:text-lg md:text-xl text-center">{feedTitle}</h1>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
             <Link
-              href="/rss"
-              className="shrink-0 font-bold text-muted hover:text-foreground min-h-[44px] flex items-center py-1"
+              href="/feeds"
+              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
               aria-label="Back to Feeds"
             >
-              ←
+              <ChevronLeftIcon className="h-4 w-4" />
             </Link>
-            <h1 className="truncate text-lg font-semibold sm:text-xl md:text-2xl">{feedTitle}</h1>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <ArticleFilterCheckboxes
-              bookmarkedOnly={bookmarkedOnly}
-              readOnly={readOnly}
-              onBookmarkedOnlyChange={setBookmarkedOnly}
-              onReadOnlyChange={setReadOnly}
-            />
             <label className="sr-only" htmlFor="feed-articles-search">
               Search articles
             </label>
@@ -155,31 +148,39 @@ export function FeedView({
                 placeholder="Search articles…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-border bg-transparent py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted min-h-[44px]"
+                className="w-full rounded-lg border border-border bg-transparent py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted min-h-[40px]"
               />
             </div>
-            <button
-              type="button"
-              onClick={refresh}
-              disabled={refreshing}
-              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full p-1.5 text-accent transition-colors hover:bg-accent/10 disabled:opacity-50"
-              aria-label={refreshing ? "Refreshing feed" : "Refresh feed"}
-            >
-              <svg
-                className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <ArticleFilterCheckboxes
+                bookmarkedOnly={bookmarkedOnly}
+                readOnly={readOnly}
+                onBookmarkedOnlyChange={setBookmarkedOnly}
+                onReadOnlyChange={setReadOnly}
+              />
+              <button
+                type="button"
+                onClick={refresh}
+                disabled={refreshing}
+                className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded-full p-1 text-accent transition-colors hover:bg-accent/10 disabled:opacity-50"
+                aria-label={refreshing ? "Refreshing feed" : "Refresh feed"}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            </button>
+                <svg
+                  className={`h-5 w-5 ${refreshing ? "animate-spin" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </StickyHeader>
         {loading ? (
@@ -190,7 +191,7 @@ export function FeedView({
           <p className="text-foreground/60 text-sm">No articles match your search.</p>
         ) : (
           <>
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
               {filteredArticles.map((article) => (
                 <li
                   key={article.id}
@@ -203,8 +204,8 @@ export function FeedView({
                   }`}
                 >
                   <Link
-                    href={`/rss/feeds/${feedId}/article/${article.id}?returnTo=/rss/feeds/${feedId}`}
-                    className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
+                    href={`/feeds/${feedId}/article/${article.id}?returnTo=/feeds/${feedId}`}
+                    className="flex min-h-0 flex-1 flex-row gap-1.5 p-2.5 sm:gap-2 sm:p-2.5"
                   >
                     <div className="min-w-0 flex-1">
                       <h2 className="text-sm font-bold leading-snug text-foreground sm:text-base">
@@ -221,7 +222,7 @@ export function FeedView({
                         {article.author ? ` • ${article.author.toUpperCase()}` : ""}
                       </p>
                     </div>
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-24 sm:w-24">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-20 sm:w-20">
                       {article.thumbnail ? (
                         <img
                           src={article.thumbnail}
@@ -256,7 +257,7 @@ export function FeedView({
                   type="button"
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="min-h-[44px] min-w-[44px] rounded border border-border px-6 py-3 sm:py-2.5 text-sm text-foreground/70 transition-colors hover:bg-surface disabled:opacity-50 touch-manipulation"
+                  className="min-h-[40px] min-w-[40px] rounded border border-border px-5 py-2.5 text-sm text-foreground/70 transition-colors hover:bg-surface disabled:opacity-50 touch-manipulation"
                 >
                   Load more
                 </button>

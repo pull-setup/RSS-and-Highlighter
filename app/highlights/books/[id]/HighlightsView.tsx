@@ -34,16 +34,18 @@ export function HighlightsView({ bookId }: { bookId: string }) {
   if (error) return <p className="text-error">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6">
-      <StickyHeader className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Highlights</h2>
-        <button
-          type="button"
-          onClick={() => setShowForm((s) => !s)}
-          className="text-sm text-muted hover:text-foreground hover:underline"
-        >
-          {showForm ? "Cancel" : "Add highlight"}
-        </button>
+    <div className="flex flex-col gap-4">
+      <StickyHeader className="flex flex-col gap-2">
+        <h2 className="text-lg font-medium text-center">Highlights</h2>
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => setShowForm((s) => !s)}
+            className="text-sm text-muted hover:text-foreground hover:underline"
+          >
+            {showForm ? "Cancel" : "Add highlight"}
+          </button>
+        </div>
       </StickyHeader>
       {showForm && (
         <AddHighlightForm
@@ -61,7 +63,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
           {highlights.map((h) => (
             <li
               key={h.id}
-              className="list-item-hover rounded-lg border border-border p-2"
+              className="list-item-hover rounded-lg border border-border p-3"
             >
               <p className="text-foreground whitespace-pre-wrap">{h.content}</p>
               {(h.location || h.note) && (

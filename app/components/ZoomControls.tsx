@@ -3,7 +3,7 @@
 import { useTextZoom } from "@/app/components/TextZoomContext";
 
 const buttonClass =
-  "flex min-h-[44px] min-w-[44px] sm:h-8 sm:w-8 sm:min-h-0 sm:min-w-0 items-center justify-center p-1.5 sm:p-1 text-sm font-semibold transition-colors touch-manipulation";
+  "flex min-h-[36px] min-w-[36px] sm:h-7 sm:w-7 sm:min-h-0 sm:min-w-0 items-center justify-center p-1 text-xs font-semibold transition-colors touch-manipulation";
 const defaultClass =
   "text-foreground/70 hover:bg-black/[.04] hover:text-foreground dark:hover:bg-white/[.06]";
 const darkClass = "text-white hover:bg-white/10";

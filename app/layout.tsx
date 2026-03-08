@@ -38,7 +38,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("reeder-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);if(t==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark");}else{var d=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",d);if(d==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark");}})();`,
+            __html: `(function(){var t=localStorage.getItem("reedsync-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);if(t==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark");}else{var d=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",d);if(d==="dark")document.documentElement.classList.add("dark");else document.documentElement.classList.remove("dark");}})();`,
           }}
         />
       </head>
@@ -48,7 +48,7 @@ export default function RootLayout({
         <Providers>
           <TextZoomProvider>
             <Nav />
-            <main className="flex-1 max-w-[1080px] w-full mx-auto min-w-0 px-4 py-6 sm:px-6 md:px-8 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
+            <main className="flex-1 max-w-[1080px] w-full mx-auto min-w-0 px-3 py-3 sm:px-5 sm:py-4 md:px-6 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))]">
               <TextZoomContent>{children}</TextZoomContent>
             </main>
             <FloatingZoomControls />

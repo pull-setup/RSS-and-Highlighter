@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
+import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
 import { HighlightText } from "@/app/components/HighlightText";
 
@@ -91,53 +92,53 @@ export function AllArticlesView() {
   if (error) return <p className="text-error">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <StickyHeader className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:min-h-[44px]">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        <StickyHeader className="flex flex-col gap-2">
+          <h1 className="truncate text-base font-semibold sm:text-lg md:text-xl text-center">All Articles</h1>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/"
-              className="shrink-0 font-bold text-muted hover:text-foreground min-h-[44px] flex items-center py-1"
+              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
               aria-label="Back to Home"
             >
-              ←
+              <ChevronLeftIcon className="h-4 w-4" />
             </Link>
-            <h1 className="truncate text-lg font-semibold sm:text-xl md:text-2xl">All</h1>
-          </div>
-          <div className="relative flex-1 min-w-0 max-w-[400px] sm:max-w-[500px]">
-            <label className="sr-only" htmlFor="all-articles-search">
-              Search articles
-            </label>
-            <svg
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            <div className="relative flex-1 min-w-0 max-w-[400px] sm:max-w-[500px]">
+              <label className="sr-only" htmlFor="all-articles-search">
+                Search articles
+              </label>
+              <svg
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                id="all-articles-search"
+                type="search"
+                placeholder="Search articles…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-lg border border-border bg-transparent py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted min-h-[40px]"
               />
-            </svg>
-            <input
-              id="all-articles-search"
-              type="search"
-              placeholder="Search articles…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-border bg-transparent py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted min-h-[44px]"
-            />
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <ArticleFilterCheckboxes
-              bookmarkedOnly={bookmarkedOnly}
-              readOnly={readOnly}
-              onBookmarkedOnlyChange={setBookmarkedOnly}
-              onReadOnlyChange={setReadOnly}
-            />
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <ArticleFilterCheckboxes
+                bookmarkedOnly={bookmarkedOnly}
+                readOnly={readOnly}
+                onBookmarkedOnlyChange={setBookmarkedOnly}
+                onReadOnlyChange={setReadOnly}
+              />
+            </div>
           </div>
         </StickyHeader>
         {loading ? (
@@ -148,7 +149,7 @@ export function AllArticlesView() {
           <p className="text-foreground/60 text-sm">No articles match your search.</p>
         ) : (
           <>
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
               {filteredArticles.map((article) => (
                 <li
                   key={`${article.feed_id}-${article.id}`}
@@ -161,14 +162,14 @@ export function AllArticlesView() {
                   }`}
                 >
                   <Link
-                    href={`/rss/feeds/${article.feed_id}/article/${article.id}?returnTo=/rss/articles`}
-                    className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
+                    href={`/feeds/${article.feed_id}/article/${article.id}?returnTo=/feeds/articles`}
+                    className="flex min-h-0 flex-1 flex-row gap-1.5 p-2.5 sm:gap-2 sm:p-2.5"
                   >
                     <div className="min-w-0 flex-1">
-                      <h2 className="text-sm font-bold leading-snug text-foreground sm:text-base">
+                      <h2 className="text-sm font-bold leading-snug text-foreground">
                         <HighlightText text={article.title} search={effectiveSearch} />
                       </h2>
-                      <p className="mt-1.5 text-xs uppercase tracking-wide text-muted sm:mt-2">
+                      <p className="mt-1 text-xs uppercase tracking-wide text-muted">
                         {article.published_at
                           ? new Date(article.published_at).toLocaleDateString("en-US", {
                               month: "short",
@@ -179,7 +180,7 @@ export function AllArticlesView() {
                         {article.author ? ` • ${article.author.toUpperCase()}` : ""}
                       </p>
                     </div>
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-24 sm:w-24">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-20 sm:w-20">
                       {article.thumbnail ? (
                         <img
                           src={article.thumbnail}
@@ -214,7 +215,7 @@ export function AllArticlesView() {
                   type="button"
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="min-h-[44px] min-w-[44px] rounded border border-border px-6 py-3 sm:py-2.5 text-sm text-foreground/70 transition-colors hover:bg-surface disabled:opacity-50 touch-manipulation"
+                  className="min-h-[40px] min-w-[40px] rounded border border-border px-5 py-2.5 text-sm text-foreground/70 transition-colors hover:bg-surface disabled:opacity-50 touch-manipulation"
                 >
                   {loadingMore ? "Loading…" : "Load more"}
                 </button>

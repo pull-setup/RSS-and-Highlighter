@@ -27,7 +27,7 @@ export async function POST() {
   }
 
   const secret = generateSecret();
-  const otpauth = generateURI({ issuer: "Reeder", label: r.email, secret });
+  const otpauth = generateURI({ issuer: "ReedSync", label: r.email, secret });
 
   await db.execute({
     sql: "UPDATE users SET totp_secret = ?, totp_enabled = 0 WHERE id = ?",

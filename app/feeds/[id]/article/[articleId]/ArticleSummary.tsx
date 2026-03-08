@@ -49,7 +49,9 @@ export function ArticleSummary({
       <div className="p-4 sm:p-5">
         <p className={titleClass}>✨ AI Summary</p>
         {summary ? (
-          <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{summary}</p>
+          <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">
+            {summary.replace(/^Here is a summary of the article in 120-150 words:\s*/i, "").trim()}
+          </p>
         ) : (
           <>
             {error && (

@@ -25,7 +25,7 @@ export function AddFeedForm() {
         setError(data.error || "Failed to add feed");
         return;
       }
-      router.push(`/rss/feeds/${data.id}`);
+      router.push(`/feeds/${data.id}`);
       router.refresh();
     } finally {
       setLoading(false);

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTheme } from "./ThemeProvider";
 
 const baseStyle = (v: string) =>
-  `sticky top-2 py-3 transition-all duration-300 ease-out ${v === "fullWidth" ? "z-40" : "z-30"}`;
+  `sticky top-1 py-1.5 transition-all duration-300 ease-out ${v === "fullWidth" ? "z-40" : "z-30"}`;
 
 function getStuckStyle(stuck: boolean, theme: "light" | "dark") {
   if (!stuck) return "bg-transparent backdrop-blur-none rounded-none border border-transparent";
@@ -38,7 +38,7 @@ export function StickyHeader({
   }, []);
 
   const layoutClass =
-    "-mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8 mb-6 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))] [padding-top:max(0.75rem,env(safe-area-inset-top))]";
+    "-mx-3 sm:-mx-5 md:-mx-6 px-3 sm:px-5 md:px-6 mb-3 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))] [padding-top:max(0.25rem,env(safe-area-inset-top))]";
 
   return (
     <>

@@ -37,12 +37,12 @@ export function HomeSections() {
   }, [bookmarkedOnly, readOnly]);
 
   return (
-    <div className="flex min-h-[80vh] flex-col gap-6">
+    <div className="flex min-h-[80vh] flex-col gap-3">
       {/* 1st half: RSS – latest 12 articles */}
-      <div className="flex flex-col gap-4 min-h-[40vh]">
-        <StickyHeader className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-xl font-semibold">Articles</h2>
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 min-h-[40vh]">
+        <StickyHeader className="flex flex-wrap items-center justify-between gap-1.5">
+          <h2 className="text-lg font-semibold">Articles</h2>
+          <div className="flex items-center gap-1.5">
             <ArticleFilterCheckboxes
               bookmarkedOnly={bookmarkedOnly}
               readOnly={readOnly}
@@ -50,11 +50,11 @@ export function HomeSections() {
               onReadOnlyChange={setReadOnly}
             />
             <Link
-              href="/rss/articles"
-              className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-border px-2.5 py-2.5 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1.5"
+              href="/feeds/articles"
+              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
               aria-label="All articles"
             >
-              <ChevronRightIcon className="h-5 w-5" />
+              <ChevronRightIcon className="h-4 w-4" />
             </Link>
           </div>
         </StickyHeader>
@@ -63,13 +63,13 @@ export function HomeSections() {
         ) : articles.length === 0 ? (
           <p className="text-foreground/60 text-sm">
             No articles yet.{" "}
-            <Link href="/rss/new" className="text-muted underline underline-offset-4 hover:text-foreground">
+            <Link href="/feeds/new" className="text-muted underline underline-offset-4 hover:text-foreground">
               Add a feed
             </Link>
             .
           </p>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {articles.map((article) => (
               <li
                 key={`${article.feed_id}-${article.id}`}
@@ -80,14 +80,14 @@ export function HomeSections() {
                 }`}
               >
                 <Link
-                  href={`/rss/feeds/${article.feed_id}/article/${article.id}?returnTo=/`}
-                  className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
+                  href={`/feeds/${article.feed_id}/article/${article.id}?returnTo=/`}
+                  className="flex min-h-0 flex-1 flex-row gap-1.5 p-2.5 sm:gap-2 sm:p-2.5"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-bold leading-snug text-foreground sm:text-base line-clamp-2">
+                    <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2">
                       {article.title}
                     </h3>
-                    <p className="mt-1.5 text-xs uppercase tracking-wide text-muted sm:mt-2">
+                    <p className="mt-1 text-xs uppercase tracking-wide text-muted">
                       {article.published_at
                         ? new Date(article.published_at).toLocaleDateString("en-US", {
                             month: "short",
@@ -98,7 +98,7 @@ export function HomeSections() {
                       {article.author ? ` • ${article.author.toUpperCase()}` : ""}
                     </p>
                   </div>
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-24 sm:w-24">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-20 sm:w-20">
                       {article.thumbnail ? (
                         <img
                           src={article.thumbnail}
@@ -120,21 +120,21 @@ export function HomeSections() {
         )}
       </div>
 
-      <div className="my-8 border-t border-border" role="separator" />
+      <div className="my-3 border-t border-border" role="separator" />
 
       {/* 2nd half: Highlights – placeholder */}
-      <div className="flex flex-col gap-4 min-h-[40vh]">
-        <StickyHeader className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Highlights</h2>
+      <div className="flex flex-col gap-2 min-h-[40vh]">
+        <StickyHeader className="flex flex-wrap items-center justify-between gap-1.5">
+          <h2 className="text-lg font-semibold">Highlights</h2>
           <Link
             href="/highlights"
-            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-border px-2.5 py-2.5 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1.5"
+            className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
             aria-label="All highlights"
           >
-            <ChevronRightIcon className="h-5 w-5" />
+            <ChevronRightIcon className="h-4 w-4" />
           </Link>
         </StickyHeader>
-        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-border border-dashed bg-surface py-12">
+        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border border-border border-dashed bg-surface py-8">
           <p className="text-foreground/60 text-sm">Highlights will appear here.</p>
           <Link
             href="/highlights"

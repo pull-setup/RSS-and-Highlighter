@@ -1,0 +1,49 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
+import { StickyHeader } from "@/app/components/StickyHeader";
+import { FeedsList } from "./FeedsList";
+
+export function FeedsPageClient() {
+  const [search, setSearch] = useState("");
+
+  return (
+    <div className="flex flex-col gap-4">
+      <StickyHeader className="flex flex-col gap-2">
+        <h1 className="text-xl font-semibold sm:text-2xl text-center">RSS Feeds</h1>
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
+          <Link
+            href="/"
+            className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
+            aria-label="Back to Home"
+          >
+            <ChevronLeftIcon className="h-4 w-4" />
+          </Link>
+          <label className="sr-only" htmlFor="feeds-search">
+            Search feeds
+          </label>
+          <input
+            id="feeds-search"
+            type="search"
+            placeholder="Search feeds…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted min-h-[40px] min-w-[180px] sm:min-w-[280px] sm:max-w-[400px]"
+          />
+          <Link
+            href="/feeds/new"
+            aria-label="Add feed"
+            className="shrink-0 flex min-h-[40px] min-w-[40px] items-center justify-center rounded border border-black/20 p-1 text-foreground hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.06] touch-manipulation"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </Link>
+        </div>
+      </StickyHeader>
+      <FeedsList search={search} />
+    </div>
+  );
+}

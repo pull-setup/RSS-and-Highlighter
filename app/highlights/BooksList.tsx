@@ -39,7 +39,7 @@ export function BooksList() {
   }
 
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col gap-1.5">
       {books.map((book) => (
         <li key={book.id}>
           <Link

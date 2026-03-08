@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { useEffect, useState } from "react";
 
 export default function TotpSetupPage() {
@@ -94,10 +95,10 @@ export default function TotpSetupPage() {
           {totpEnabled && (
             <Link
               href="/"
-              className="font-bold text-muted hover:text-foreground"
+              className="flex min-h-[36px] min-w-[36px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground sm:min-h-0 sm:min-w-0 sm:py-1"
               aria-label="Back to Home"
             >
-              ←
+              <ChevronLeftIcon className="h-4 w-4" />
             </Link>
           )}
         </div>
