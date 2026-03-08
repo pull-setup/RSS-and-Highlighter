@@ -48,6 +48,12 @@ export async function GET(
   const limit = Math.min(MAX_LIMIT, Math.max(1, Number(searchParams.get("limit")) || DEFAULT_LIMIT));
   const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
 
+  const countResult = await db.execute({
+    sql: "SELECT COUNT(*) AS total FROM articles WHERE feed_id = ?",
+    args: [feedId],
+  });
+  const total = Number((countResult.rows[0] as { total: number }).total ?? 0);
+
   let result: { rows: Array<Record<string, unknown>> };
   try {
     result = await db.execute({
@@ -82,5 +88,5 @@ export async function GET(
       excerpt: content ? excerptFromHtml(content) : null,
     };
   });
-  return NextResponse.json(articles);
+  return NextResponse.json({ articles, total });
 }

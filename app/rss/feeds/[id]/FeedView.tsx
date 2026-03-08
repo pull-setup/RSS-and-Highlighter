@@ -28,6 +28,7 @@ export function FeedView({
   feedTitle: string;
 }) {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [total, setTotal] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -43,9 +44,10 @@ export function FeedView({
           const data = await r.json().catch(() => ({}));
           throw new Error((data as { error?: string }).error || `Failed (${r.status})`);
         }
-        return r.json() as Promise<Article[]>;
+        return r.json() as Promise<{ articles: Article[]; total: number }>;
       })
-      .then((data) => {
+      .then(({ articles: data, total: feedTotal }) => {
+        setTotal(feedTotal);
         const nextTotal = append ? articles.length + data.length : data.length;
         setArticles((prev) => (append ? [...prev, ...data] : data));
         setHasMore(data.length === limit && nextTotal < MAX_ARTICLES_PER_FEED);
@@ -223,7 +225,7 @@ export function FeedView({
           </ul>
           {!search.trim() && filteredArticles.length > 0 && (
             <p className="text-center text-sm text-foreground/60 pt-1">
-              Showing 1–{filteredArticles.length} of up to {MAX_ARTICLES_PER_FEED} · 12 per page
+              Showing 1–{filteredArticles.length} of {total ?? MAX_ARTICLES_PER_FEED} · 12 per page
             </p>
           )}
           {hasMore && !search.trim() && (
