@@ -10,7 +10,7 @@ export function ArticleTextZoom({ children }: { children: React.ReactNode }) {
   const scale = zoom / 100;
   return (
     <div
-      className="article-text-zoom"
+      className="article-text-zoom min-w-0"
       style={
         scale !== 1
           ? ({ zoom: scale } as React.CSSProperties)

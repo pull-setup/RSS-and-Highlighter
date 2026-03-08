@@ -135,7 +135,7 @@ export function AllArticlesView() {
                   }`}
                 >
                   <Link
-                    href={`/rss/feeds/${article.feed_id}/article/${article.id}`}
+                    href={`/rss/feeds/${article.feed_id}/article/${article.id}?returnTo=/rss/articles`}
                     className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
                   >
                     <div className="min-w-0 flex-1">

@@ -6,16 +6,24 @@ import { ArticleActions } from "./ArticleActions";
 import { ArticleSummary } from "./ArticleSummary";
 import { ArticleTextZoom } from "./ArticleTextZoom";
 import { ArticleTitleSection } from "./ArticleTitleSection";
+import { ArticleBottomNav } from "./ArticleBottomNav";
+import { ArticleFloatingZoomControls } from "./ArticleFloatingZoomControls";
 import { ImageWithExpand } from "./ImageWithExpand";
 
 export default async function ArticlePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string; articleId: string }>;
+  searchParams: Promise<{ returnTo?: string }>;
 }) {
   const session = await auth();
   if (!session) redirect("/auth/signin?callbackUrl=/rss");
   const { id: feedId, articleId } = await params;
+  const { returnTo } = await searchParams;
+  const isValidReturnTo =
+    returnTo && typeof returnTo === "string" && returnTo.startsWith("/") && !returnTo.startsWith("//") && !/^https?:\/\//i.test(returnTo);
+  const returnToQuery = isValidReturnTo ? `returnTo=${encodeURIComponent(returnTo)}` : "";
   const feedRow = await db.execute({
     sql: "SELECT id, title FROM feeds WHERE id = ? AND user_id = ?",
     args: [feedId, session.user.id],
@@ -32,15 +40,17 @@ export default async function ArticlePage({
   const row = articleRow.rows[0] as Record<string, unknown>;
   const currentId = Number(row.id);
   const ordered = await db.execute({
-    sql: "SELECT id FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC",
+    sql: "SELECT id, title FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC",
     args: [feedId],
-  });
-  const ids = ordered.rows.map((r) => Number((r as Record<string, unknown>).id));
+  }) as { rows: Array<Record<string, unknown>> };
+  const ids = ordered.rows.map((r) => Number(r.id));
   const idx = ids.indexOf(currentId);
   const prevId = idx > 0 ? ids[idx - 1] : null;
   const nextId = idx >= 0 && idx < ids.length - 1 ? ids[idx + 1] : null;
-  const prevArticleHref = prevId != null ? `/rss/feeds/${feedId}/article/${prevId}` : null;
-  const nextArticleHref = nextId != null ? `/rss/feeds/${feedId}/article/${nextId}` : null;
+  const prevArticleHref = prevId != null ? `/rss/feeds/${feedId}/article/${prevId}${returnToQuery ? `?${returnToQuery}` : ""}` : null;
+  const nextArticleHref = nextId != null ? `/rss/feeds/${feedId}/article/${nextId}${returnToQuery ? `?${returnToQuery}` : ""}` : null;
+  const prevArticleTitle = prevId != null ? String(ordered.rows[idx - 1]?.title ?? "") : null;
+  const nextArticleTitle = nextId != null ? String(ordered.rows[idx + 1]?.title ?? "") : null;
 
   const content = row.content != null ? String(row.content) : null;
   let image_url: string | null = (row.image_url != null && row.image_url !== "") ? String(row.image_url) : null;
@@ -49,6 +59,10 @@ export default async function ArticlePage({
     if (firstImg) image_url = firstImg.startsWith("http") ? firstImg : (() => { try { return new URL(firstImg, String(row.url)).href; } catch { return null; } })();
   }
   const summary = row.summary != null && String(row.summary).trim() !== "" ? String(row.summary) : null;
+  const wordCount = content
+    ? content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().split(/\s+/).filter(Boolean).length
+    : 0;
+  const readingTimeMinutes = wordCount > 0 ? Math.max(1, Math.ceil(wordCount / 200)) : null;
   const article = {
     id: Number(row.id),
     url: String(row.url ?? ""),
@@ -61,37 +75,41 @@ export default async function ArticlePage({
     summary,
   };
   return (
-    <div className="flex flex-col gap-6 pb-8">
-      <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 pb-8 min-w-0">
+      <div className="flex flex-col gap-4 min-w-0">
         <ArticleActions
           articleId={article.id}
           isRead={Boolean(article.is_read)}
           articleUrl={article.url}
           feedId={feedId}
           feedTitle={feed.title}
-          prevArticleHref={prevArticleHref}
-          nextArticleHref={nextArticleHref}
         />
       <article className="min-w-0">
         <ArticleTitleSection
           title={article.title}
           publishedAt={article.published_at}
           author={article.author}
-          prevArticleHref={prevArticleHref}
-          nextArticleHref={nextArticleHref}
+          readingTimeMinutes={readingTimeMinutes}
         />
         {article.image_url && (
           <ImageWithExpand
             src={article.image_url}
-            wrapperClassName="mb-6"
+            wrapperClassName="mb-6 min-w-0 overflow-hidden"
             className="aspect-[2/1] w-full object-cover rounded-lg bg-black/5 dark:bg-white/5"
           />
         )}
         <ArticleTextZoom>
           <ArticleSummary articleId={article.id} initialSummary={article.summary} />
           <ArticleContent content={article.content} />
+          <ArticleBottomNav
+            prevArticleHref={prevArticleHref}
+            nextArticleHref={nextArticleHref}
+            prevArticleTitle={prevArticleTitle}
+            nextArticleTitle={nextArticleTitle}
+          />
         </ArticleTextZoom>
       </article>
+      <ArticleFloatingZoomControls />
       </div>
     </div>
   );

@@ -124,15 +124,18 @@ export function ArticleContent({ content }: { content: string | null }) {
   return (
     <>
       <style>{`
-        /* article body */
-        .article-body img { max-width: 100%; border-radius: 8px; display: block; margin-left: auto; margin-right: auto; }
+        /* article body - mobile-friendly */
+        .article-body { overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; overflow-x: hidden; }
+        .article-body img { max-width: 100%; height: auto; border-radius: 8px; display: block; margin-left: auto; margin-right: auto; }
+        .article-body pre, .article-body code, .article-body table { max-width: 100%; overflow-x: auto; }
+        .article-body pre { white-space: pre-wrap; word-break: break-word; }
         .article-body .article-image-wrap img { pointer-events: none; cursor: pointer; }
         .article-body .article-image-wrap { cursor: pointer; }
         .article-body a { text-decoration: underline; color: #6b7280; }
         .article-body a:hover { color: #4b5563; }
         .dark .article-body a { color: #9ca3af; }
         .dark .article-body a:hover { color: #d1d5db; }
-        .article-body p { margin-bottom: 0.75rem; }
+        .article-body p { margin-bottom: 0.75rem; text-align: justify; }
         .article-body h2 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.25rem; font-weight: 700; }
         .article-body h3 { margin-top: 1.25rem; margin-bottom: 0.4rem; font-size: 1.1rem; font-weight: 600; }
         .article-body h4, .article-body h5 { margin-top: 1rem; margin-bottom: 0.3rem; font-weight: 600; }
@@ -148,7 +151,7 @@ export function ArticleContent({ content }: { content: string | null }) {
         .article-body .article-image-wrap img { cursor: pointer; transition: opacity 0.2s; }
         .article-body .article-image-wrap img:hover { opacity: 0.95; }
         /* Substack post embed */
-        .article-body .embedded-post-wrap { border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; overflow: hidden; margin: 1.25rem auto; max-width: 520px; text-align: left; }
+        .article-body .embedded-post-wrap { border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; overflow: hidden; margin: 1.25rem auto; max-width: min(520px, 100%); text-align: left; }
         .article-body .embedded-post { display: block; padding: 16px; text-decoration: none !important; color: inherit; }
         .article-body .embedded-post:hover { background: rgba(128,128,128,0.05); }
         .article-body .embedded-post-header { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(128,128,128,0.15); }
@@ -160,22 +163,22 @@ export function ArticleContent({ content }: { content: string | null }) {
         .article-body .embedded-post-cta { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 4px 12px; border-radius: 4px; border: 1px solid rgba(128,128,128,0.3); }
         .article-body .embedded-post-meta { font-size: 0.78rem; opacity: 0.55; }
         /* iframe placeholder (embeds: video/Substack etc.) */
-        .article-body .embed-iframe-placeholder { margin: 1rem 0; padding: 1.25rem; text-align: center; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; background: rgba(128,128,128,0.06); }
+        .article-body .embed-iframe-placeholder { margin: 1rem 0; padding: 1rem; text-align: center; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; background: rgba(128,128,128,0.06); max-width: 100%; }
         .article-body .embed-iframe-placeholder a { display: inline-block; padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; text-decoration: none !important; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); color: var(--foreground); }
         .article-body .embed-iframe-placeholder a:hover { background: rgba(128,128,128,0.1); }
         /* Twitter card */
-        .tweet-card { border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; padding: 16px; margin: 1.25rem auto; max-width: 520px; text-align: left; }
-        .tweet-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tweet-card { border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; padding: 16px; margin: 1.25rem auto; max-width: min(520px, 100%); text-align: left; }
+        .tweet-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; min-width: 0; }
         .tweet-name { font-weight: 700; font-size: 0.95rem; }
         .tweet-handle { font-size: 0.82rem; opacity: 0.6; }
         .tweet-logo { width: 18px; height: 18px; margin-left: auto; flex-shrink: 0; }
         .tweet-text { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.55; }
-        .tweet-meta { display: flex; align-items: center; gap: 14px; font-size: 0.8rem; opacity: 0.6; flex-wrap: wrap; }
+        .tweet-meta { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; opacity: 0.6; flex-wrap: wrap; min-width: 0; }
         .tweet-link { margin-left: auto; opacity: 1; color: #1d9bf0; text-decoration: none !important; }
       `}</style>
-      <div ref={bodyRef}>
+      <div ref={bodyRef} className="min-w-0">
         <div
-          className="article-body text-foreground"
+          className="article-body text-foreground min-w-0"
           dangerouslySetInnerHTML={{ __html: processed }}
         />
       </div>

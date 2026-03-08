@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+
+function isValidReturnTo(v: string | null): v is string {
+  if (!v || typeof v !== "string") return false;
+  if (!v.startsWith("/") || v.startsWith("//")) return false;
+  if (/^https?:\/\//i.test(v)) return false;
+  return true;
+}
 
 export function ChevronLeftIcon({ className }: { className?: string }) {
   return (
@@ -32,18 +39,16 @@ export function ArticleActions({
   articleUrl,
   feedId,
   feedTitle,
-  prevArticleHref = null,
-  nextArticleHref = null,
 }: {
   articleId: number;
   isRead: boolean;
   articleUrl: string;
   feedId: string;
   feedTitle: string;
-  prevArticleHref?: string | null;
-  nextArticleHref?: string | null;
 }) {
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
+  const backHref = isValidReturnTo(returnTo) ? returnTo : `/rss/feeds/${feedId}`;
   const [read, setRead] = useState(isRead);
 
   async function toggle() {
@@ -57,39 +62,36 @@ export function ArticleActions({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <div className="flex flex-row items-center justify-between gap-2 min-w-0">
+      <Link
+        href={backHref}
+        className="flex min-h-[44px] min-w-0 items-center gap-1.5 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 sm:min-h-0 sm:py-0 text-left dark:text-gray-400 dark:hover:text-gray-300"
+      >
+        <span className="shrink-0 text-base leading-none">←</span>
+        <span className="truncate">Back</span>
+      </Link>
+      <div className="flex items-center gap-2 shrink-0">
+        <a
+          href={articleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open original article"
+          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 px-2.5 py-2.5 text-foreground/70 transition-colors hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06] sm:min-h-0 sm:min-w-0 sm:py-1.5"
+        >
+          <ExternalLinkIcon className="h-5 w-5" />
+        </a>
         <button
           type="button"
-          onClick={() => router.back()}
-          className="flex min-h-[44px] min-w-0 items-center gap-1.5 py-2 text-sm text-gray-500 transition-colors hover:text-gray-700 sm:min-h-0 sm:py-0 text-left dark:text-gray-400 dark:hover:text-gray-300"
+          onClick={toggle}
+          aria-label={read ? "Mark unread" : "Mark read"}
+          className={`flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border px-3 py-2.5 text-sm transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
+            read
+              ? "border-black/10 text-foreground/50 hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06]"
+              : "border-black/20 text-foreground hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.06]"
+          }`}
         >
-          <span className="shrink-0 text-base leading-none">←</span>
-          <span className="truncate">Back</span>
+          {read ? "Mark unread" : "Mark read"}
         </button>
-        <div className="flex flex-wrap items-center gap-2">
-          <a
-            href={articleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open original article"
-            className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border border-black/10 px-2.5 py-2.5 text-foreground/70 transition-colors hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06] sm:min-h-0 sm:min-w-0 sm:py-1.5"
-          >
-            <ExternalLinkIcon className="h-5 w-5" />
-          </a>
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={read ? "Mark unread" : "Mark read"}
-            className={`flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded border px-3 py-2.5 text-sm transition-colors sm:min-h-0 sm:min-w-0 sm:py-1.5 ${
-              read
-                ? "border-black/10 text-foreground/50 hover:bg-black/[.04] dark:border-white/10 dark:hover:bg-white/[.06]"
-                : "border-black/20 text-foreground hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.06]"
-            }`}
-          >
-            {read ? "Mark unread" : "Mark read"}
-          </button>
-        </div>
       </div>
     </div>
   );

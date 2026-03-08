@@ -178,7 +178,7 @@ export function FeedView({
                 }`}
               >
                 <Link
-                  href={`/rss/feeds/${feedId}/article/${article.id}`}
+                  href={`/rss/feeds/${feedId}/article/${article.id}?returnTo=/rss/feeds/${feedId}`}
                   className="flex min-h-0 flex-1 flex-row gap-1.5 p-1.5 sm:gap-2 sm:p-2"
                 >
                   <div className="min-w-0 flex-1">
