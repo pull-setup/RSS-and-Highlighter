@@ -33,20 +33,23 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const limit = Math.min(MAX_LIMIT, Math.max(1, Number(searchParams.get("limit")) || DEFAULT_LIMIT));
   const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
+  const readOnly = searchParams.get("readOnly") === "true" || searchParams.get("readOnly") === "1";
+  const readFilter = readOnly ? " AND a.is_read = 1" : "";
 
   const countResult = await db.execute({
-    sql: `SELECT COUNT(*) AS total FROM articles a INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?`,
+    sql: `SELECT COUNT(*) AS total FROM articles a INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?${readFilter}`,
     args: [session.user.id],
   });
   const total = Number((countResult.rows[0] as unknown as { total: number }).total ?? 0);
+
+  const orderBy = readOnly ? "a.published_at DESC, a.id DESC" : "a.is_read ASC, a.published_at DESC, a.id DESC";
 
   let result: { rows: Array<Record<string, unknown>> };
   try {
     result = await db.execute({
       sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at, a.image_url
-            FROM articles a
-            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
-            ORDER BY a.published_at DESC, a.id DESC
+            FROM articles a INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?${readFilter}
+            ORDER BY ${orderBy}
             LIMIT ? OFFSET ?`,
       args: [session.user.id, limit, offset],
     }) as { rows: Array<Record<string, unknown>> };
@@ -55,9 +58,8 @@ export async function GET(req: Request) {
     if (!msg.includes("image_url")) throw e;
     result = await db.execute({
       sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at
-            FROM articles a
-            INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
-            ORDER BY a.published_at DESC, a.id DESC
+            FROM articles a INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?${readFilter}
+            ORDER BY ${orderBy}
             LIMIT ? OFFSET ?`,
       args: [session.user.id, limit, offset],
     }) as { rows: Array<Record<string, unknown>> };

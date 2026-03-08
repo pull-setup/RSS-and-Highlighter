@@ -42,7 +42,9 @@ export function Nav() {
   }, [session]);
 
   return (
-    <nav className="border-b border-black/10 dark:border-white/10 [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]">
+    <nav
+      className="z-50 border-b border-black/10 dark:border-white/10 bg-[var(--background)] [padding-left:max(1rem,env(safe-area-inset-left))] [padding-right:max(1rem,env(safe-area-inset-right))]"
+    >
       <div className="max-w-4xl mx-auto px-3 sm:px-4 min-h-[3rem] sm:min-h-[3.5rem] flex flex-wrap items-center justify-between gap-2 sm:gap-4 py-2 sm:py-0">
         <div className="flex justify-start items-center gap-2 min-h-[44px] min-w-0">
           <Link href="/" className="flex items-center gap-1.5 sm:gap-2 text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 min-h-[44px] items-center py-1">

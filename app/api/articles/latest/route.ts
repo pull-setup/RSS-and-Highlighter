@@ -36,7 +36,7 @@ export async function GET(req: Request) {
       sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at, a.image_url
             FROM articles a
             INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
-            ORDER BY a.published_at DESC, a.id DESC
+            ORDER BY a.is_read ASC, a.published_at DESC, a.id DESC
             LIMIT ?`,
       args: [session.user.id, limit],
     }) as { rows: Array<Record<string, unknown>> };
@@ -47,7 +47,7 @@ export async function GET(req: Request) {
       sql: `SELECT a.id, a.feed_id, a.guid, a.url, a.title, a.content, a.author, a.published_at, a.is_read, a.created_at
             FROM articles a
             INNER JOIN feeds f ON f.id = a.feed_id AND f.user_id = ?
-            ORDER BY a.published_at DESC, a.id DESC
+            ORDER BY a.is_read ASC, a.published_at DESC, a.id DESC
             LIMIT ?`,
       args: [session.user.id, limit],
     }) as { rows: Array<Record<string, unknown>> };

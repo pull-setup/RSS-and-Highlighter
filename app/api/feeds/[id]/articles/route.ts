@@ -57,14 +57,14 @@ export async function GET(
   let result: { rows: Array<Record<string, unknown>> };
   try {
     result = await db.execute({
-      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at, image_url FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?",
+      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at, image_url FROM articles WHERE feed_id = ? ORDER BY is_read ASC, published_at DESC, id DESC LIMIT ? OFFSET ?",
       args: [feedId, limit, offset],
     }) as { rows: Array<Record<string, unknown>> };
   } catch (e: unknown) {
     const msg = String((e as { message?: string })?.message ?? "");
     if (!msg.includes("image_url")) throw e;
     result = await db.execute({
-      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at FROM articles WHERE feed_id = ? ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?",
+      sql: "SELECT id, guid, url, title, content, author, published_at, is_read, created_at FROM articles WHERE feed_id = ? ORDER BY is_read ASC, published_at DESC, id DESC LIMIT ? OFFSET ?",
       args: [feedId, limit, offset],
     }) as { rows: Array<Record<string, unknown>> };
   }

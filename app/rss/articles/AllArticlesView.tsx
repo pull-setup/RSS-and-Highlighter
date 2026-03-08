@@ -25,6 +25,7 @@ export function AllArticlesView() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+  const [readOnly, setReadOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -32,7 +33,9 @@ export function AllArticlesView() {
 
   const load = useCallback((offset: number, append: boolean) => {
     const limit = PAGE_SIZE;
-    return fetch(`/api/articles?limit=${limit}&offset=${offset}`)
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+    if (readOnly) params.set("readOnly", "true");
+    return fetch(`/api/articles?${params}`)
       .then(async (r) => {
         if (!r.ok) {
           const data = await r.json().catch(() => ({}));
@@ -50,7 +53,7 @@ export function AllArticlesView() {
         setLoading(false);
         setLoadingMore(false);
       });
-  }, []);
+  }, [readOnly]);
 
   useEffect(() => {
     load(0, false);
@@ -64,14 +67,13 @@ export function AllArticlesView() {
   }
 
   const searchLower = search.trim().toLowerCase();
-  const filteredArticles = searchLower
-    ? articles.filter(
-        (a) =>
-          a.title.toLowerCase().includes(searchLower) ||
-          (a.content != null && a.content.toLowerCase().includes(searchLower)) ||
-          (a.excerpt != null && a.excerpt.toLowerCase().includes(searchLower))
-      )
-    : articles;
+  const filteredArticles = articles.filter(
+    (a) =>
+      !searchLower ||
+      a.title.toLowerCase().includes(searchLower) ||
+      (a.content != null && a.content.toLowerCase().includes(searchLower)) ||
+      (a.excerpt != null && a.excerpt.toLowerCase().includes(searchLower))
+  );
 
   if (loading) return <p className="text-foreground/70">Loading…</p>;
   if (error) return <p className="text-red-600 dark:text-red-400">{error}</p>;
@@ -90,6 +92,15 @@ export function AllArticlesView() {
             <h1 className="truncate text-lg font-semibold sm:text-xl md:text-2xl">All articles</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <label className="flex min-h-[44px] cursor-pointer items-center gap-2 shrink-0">
+              <input
+                type="checkbox"
+                checked={readOnly}
+                onChange={(e) => setReadOnly(e.target.checked)}
+                className="h-4 w-4 rounded border-black/20 text-foreground focus:ring-foreground/30 dark:border-white/20"
+              />
+              <span className="text-sm text-foreground/80 whitespace-nowrap">Read only</span>
+            </label>
             <label className="sr-only" htmlFor="all-articles-search">
               Search articles
             </label>
@@ -173,9 +184,11 @@ export function AllArticlesView() {
                 </li>
               ))}
             </ul>
-            {!search.trim() && filteredArticles.length > 0 && (
+            {filteredArticles.length > 0 && (
               <p className="text-center text-sm text-foreground/60 pt-1">
-                Showing 1–{filteredArticles.length} of {total ?? 0}
+                {readOnly
+                  ? `Showing 1–${filteredArticles.length} of ${total ?? 0} read`
+                  : `Showing 1–${filteredArticles.length} of ${total ?? 0}`}
               </p>
             )}
             {hasMore && !search.trim() && (
