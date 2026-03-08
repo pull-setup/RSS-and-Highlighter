@@ -139,7 +139,7 @@ export async function POST(req: Request) {
     });
     const feedId = Number(insert.lastInsertRowid ?? 0);
     const now = new Date().toISOString();
-    const items = (feed.items ?? []).slice(0, 100);
+    const items = (feed.items ?? []).slice(0, 36);
     for (const item of items) {
       const guid = item.guid || item.link || item.title || "";
       if (!guid) continue;

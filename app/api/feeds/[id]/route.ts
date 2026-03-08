@@ -99,10 +99,12 @@ export async function PATCH(
   try {
     const feed = await parser.parseURL(url);
     const now = new Date().toISOString();
-    const items = (feed.items ?? []).slice(0, 100);
+    const items = (feed.items ?? []).slice(0, 36);
+    const keptGuids: string[] = [];
     for (const item of items) {
       const guid = item.guid || item.link || item.title || "";
       if (!guid) continue;
+      keptGuids.push(guid);
       const articleUrl = item.link?.trim() || "";
       const i = item as unknown as Record<string, unknown>;
       const imageUrl = getItemImage({ enclosure: item.enclosure, content: String(i.content ?? ""), contentEncoded: String(i.contentEncoded ?? ""), link: item.link }, articleUrl || url);
@@ -117,6 +119,15 @@ export async function PATCH(
           await db.execute({ sql: "UPDATE articles SET content = ? WHERE guid = ? AND feed_id = ?", args: [content, guid, id] });
         }
       }
+    }
+    if (keptGuids.length > 0) {
+      const placeholders = keptGuids.map(() => "?").join(",");
+      await db.execute({
+        sql: `DELETE FROM articles WHERE feed_id = ? AND guid NOT IN (${placeholders})`,
+        args: [id, ...keptGuids],
+      });
+    } else {
+      await db.execute({ sql: "DELETE FROM articles WHERE feed_id = ?", args: [id] });
     }
     await db.execute({
       sql: "UPDATE feeds SET last_fetched_at = ? WHERE id = ?",
