@@ -32,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
           userId = Number(insert.lastInsertRowid ?? 1);
         } else {
-          userId = Number((row.rows[0] as { id: number }).id);
+          userId = Number((row.rows[0] as unknown as { id: number }).id);
         }
         return { id: String(userId), email, name };
       },

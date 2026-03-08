@@ -19,7 +19,7 @@ export default async function BookPage({
     args: [id, session.user.id],
   });
   if (bookRow.rows.length === 0) notFound();
-  const book = bookRow.rows[0] as { id: number; title: string; author: string; asin: string | null };
+  const book = bookRow.rows[0] as unknown as { id: number; title: string; author: string; asin: string | null };
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">

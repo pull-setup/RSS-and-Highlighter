@@ -19,7 +19,7 @@ export default async function FeedPage({
     args: [id, session.user.id],
   });
   if (row.rows.length === 0) notFound();
-  const feed = row.rows[0] as {
+  const feed = row.rows[0] as unknown as {
     id: number;
     url: string;
     title: string;

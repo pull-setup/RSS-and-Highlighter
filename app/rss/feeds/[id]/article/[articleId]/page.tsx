@@ -18,7 +18,7 @@ export default async function ArticlePage({
     args: [feedId, session.user.id],
   });
   if (feedRow.rows.length === 0) notFound();
-  const feed = feedRow.rows[0] as { id: number; title: string };
+  const feed = feedRow.rows[0] as unknown as { id: number; title: string };
   let articleRow: { rows: Array<Record<string, unknown>> };
   try {
     articleRow = await db.execute({ sql: "SELECT id, url, title, content, author, published_at, is_read, image_url FROM articles WHERE id = ? AND feed_id = ?", args: [articleId, feedId] }) as { rows: Array<Record<string, unknown>> };

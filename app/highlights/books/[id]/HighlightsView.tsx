@@ -165,7 +165,7 @@ function AddHighlightForm({
         </button>
         <button
           type="button"
-          onClick={() => setContent("") || setLocation("") || setNote("")}
+          onClick={() => { setContent(""); setLocation(""); setNote(""); }}
           className="rounded border border-black/10 dark:border-white/10 py-2 px-4 text-sm hover:bg-black/[.02] dark:hover:bg-white/[.06]"
         >
           Clear

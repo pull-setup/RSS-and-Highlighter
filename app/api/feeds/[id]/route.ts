@@ -86,7 +86,7 @@ export async function PATCH(
   if (row.rows.length === 0) {
     return NextResponse.json({ error: "Feed not found" }, { status: 404 });
   }
-  const url = (row.rows[0] as { url: string }).url;
+  const url = (row.rows[0] as unknown as { url: string }).url;
   try {
     const feed = await parser.parseURL(url);
     const now = new Date().toISOString();
