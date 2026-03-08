@@ -146,7 +146,7 @@ export async function POST(req: Request) {
       const articleUrl = item.link?.trim() || "";
       const i = item as unknown as Record<string, unknown>;
       const imageUrl = getItemImage({ enclosure: item.enclosure, content: String(i.content ?? ""), contentEncoded: String(i.contentEncoded ?? ""), link: item.link }, articleUrl || feedUrl);
-      const content = (String(i.contentEncoded ?? "") || String(i.content ?? "") || String(i.contentSnippet ?? "")).slice(0, 50000);
+      const content = (String(i.contentEncoded ?? "") || String(i.content ?? "") || String(i.contentSnippet ?? "")).trim();
       const argsWithImage = [feedId, guid, articleUrl, String(i.title ?? "").trim(), content, String(i.creator ?? i.author ?? "") || null, i.pubDate ? new Date(String(i.pubDate)).toISOString() : null, imageUrl];
       try {
         await db.execute({ sql: "INSERT OR IGNORE INTO articles (feed_id, guid, url, title, content, author, published_at, is_read, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)", args: argsWithImage });
