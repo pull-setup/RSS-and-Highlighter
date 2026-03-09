@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
-import { BooksSkeletonList } from "@/app/components/ArticleSkeleton";
+import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 
 type Book = {
   id: number;
@@ -26,7 +26,7 @@ export function BooksList() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <BooksSkeletonList count={4} />;
+  if (loading) return <LoadingWithLogo />;
   if (error) return <p className="text-error">{error}</p>;
   if (books.length === 0) {
     return (

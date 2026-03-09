@@ -48,7 +48,7 @@ export default function RootLayout({
         <Providers>
           <TextZoomProvider>
             <Nav />
-            <main className="flex-1 max-w-[1080px] w-full mx-auto min-w-0 px-3 py-3 sm:px-5 sm:py-4 md:px-6 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))]">
+            <main className="flex-1 max-w-[960px] w-full mx-auto min-w-0 px-3 py-3 sm:px-5 sm:py-4 md:px-6 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))]">
               <TextZoomContent>{children}</TextZoomContent>
             </main>
             <FloatingZoomControls />

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
 import { ChevronRightIcon } from "@/app/components/ArticleIcons";
-import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
 
 type LatestArticle = {
@@ -52,7 +52,7 @@ export function HomeSections() {
       {/* 1st half: RSS – latest 12 articles */}
       <div className="flex flex-col gap-2 min-h-[40vh]">
         <StickyHeader className="flex flex-wrap items-center justify-between gap-1.5">
-          <h2 className="text-lg font-semibold">Articles</h2>
+          <h2 className="text-base font-semibold sm:text-lg md:text-xl">Articles</h2>
           <div className="flex items-center gap-1.5">
             <ArticleFilterCheckboxes
               bookmarkedOnly={bookmarkedOnly}
@@ -70,7 +70,7 @@ export function HomeSections() {
           </div>
         </StickyHeader>
         {loading ? (
-          <ArticleSkeletonGrid count={12} />
+          <LoadingWithLogo />
         ) : articles.length === 0 ? (
           bookmarkedOnly || readOnly ? (
             <EmptyState message="No articles match your filters." />
@@ -137,7 +137,7 @@ export function HomeSections() {
       {/* 2nd half: Highlights – placeholder */}
       <div className="flex flex-col gap-2 min-h-[40vh]">
         <StickyHeader className="flex flex-wrap items-center justify-between gap-1.5">
-          <h2 className="text-lg font-semibold">Highlights</h2>
+          <h2 className="text-base font-semibold sm:text-lg md:text-xl">Highlights</h2>
           <Link
             href="/highlights"
             className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"

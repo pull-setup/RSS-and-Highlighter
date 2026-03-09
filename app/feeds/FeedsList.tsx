@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
-import { FeedsSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 
 type Feed = {
   id: number;
@@ -54,7 +54,7 @@ export function FeedsList({ search = "" }: { search?: string }) {
 
   const filtered = feeds;
 
-  if (loading) return <FeedsSkeletonGrid count={6} />;
+  if (loading) return <LoadingWithLogo />;
   if (error) return <p className="text-error">{error}</p>;
   if (feeds.length === 0) {
     return (

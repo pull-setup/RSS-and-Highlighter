@@ -12,7 +12,7 @@ export function FeedsPageClient() {
   return (
     <div className="flex flex-col gap-4">
       <StickyHeader className="flex flex-col gap-2">
-        <h1 className="text-xl font-semibold sm:text-2xl text-center">RSS Feeds</h1>
+        <h1 className="text-base font-semibold sm:text-lg md:text-xl text-center">RSS Feeds</h1>
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
           <Link
             href="/"

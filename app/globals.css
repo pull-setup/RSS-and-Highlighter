@@ -67,9 +67,27 @@ body {
   }
 }
 
+@keyframes loading-breathe {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+@keyframes loading-dot {
+  0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-4px); }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .animate-loading-breathe {
+    animation: loading-breathe 1.5s ease-in-out infinite;
+  }
+
+  .animate-loading-dot {
+    animation: loading-dot 1.4s ease-in-out infinite;
   }
 
   .list-item-hover {

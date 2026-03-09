@@ -34,10 +34,10 @@ export function Nav() {
       <nav
         className="z-50 border-b border-border bg-[var(--background)]"
       >
-        <div className="max-w-[1140px] mx-auto px-3 sm:px-5 md:px-6 flex items-center justify-between min-h-[2.75rem] py-1.5 sm:py-1 gap-2 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))]">
+        <div className="max-w-[1020px] mx-auto px-3 sm:px-5 md:px-6 flex items-center justify-between min-h-[2.75rem] py-1.5 sm:py-1 gap-2 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))]">
           <Link href="/" className="flex items-center gap-1.5 sm:gap-2 text-yellow-500 hover:text-yellow-600 min-h-[40px] items-center py-0.5 shrink-0">
             <BookIcon className="h-4 w-5 sm:h-5 sm:w-5 shrink-0" />
-            <span className="text-base sm:text-lg font-semibold truncate">ReedSync</span>
+            <span className="text-xl sm:text-2xl font-semibold truncate">ReedSync</span>
           </Link>
           <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
             {status === "loading" ? null : session ? (

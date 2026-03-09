@@ -6,6 +6,7 @@ import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
 
@@ -106,7 +107,6 @@ export function AllArticlesView() {
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
         <StickyHeader className="flex flex-col gap-2">
-          <h1 className="truncate text-base font-semibold sm:text-lg md:text-xl text-center">All Articles</h1>
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/"
@@ -115,6 +115,7 @@ export function AllArticlesView() {
             >
               <ChevronLeftIcon className="h-4 w-4" />
             </Link>
+            <h1 className="truncate text-base font-semibold sm:text-lg md:text-xl text-center md:text-left shrink-0">All Articles</h1>
             <div className="relative flex-1 min-w-0">
               <label className="sr-only" htmlFor="all-articles-search">
                 Search articles
@@ -153,7 +154,7 @@ export function AllArticlesView() {
           </div>
         </StickyHeader>
         {loading ? (
-          <ArticleSkeletonGrid count={PAGE_SIZE} />
+          <LoadingWithLogo />
         ) : articles.length === 0 ? (
           bookmarkedOnly || readOnly ? (
             <EmptyState message="No articles match your filters." />

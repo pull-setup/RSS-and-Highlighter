@@ -18,7 +18,7 @@ export default async function NewBookPage() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold text-center">Add book</h1>
+          <h1 className="text-base font-semibold sm:text-lg md:text-xl text-center">Add book</h1>
           <div className="flex items-center">
             <Link
               href="/highlights"

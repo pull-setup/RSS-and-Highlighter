@@ -45,7 +45,7 @@ export default async function BookPage({
       <div className="flex flex-col gap-3">
         <StickyHeader className="flex flex-col gap-2">
           <div>
-            <h1 className="text-2xl font-semibold text-center">{book.title}</h1>
+            <h1 className="text-base font-semibold sm:text-lg md:text-xl text-center truncate">{book.title}</h1>
             <p className="text-foreground/70">{book.author}</p>
           </div>
           <div className="flex items-center">

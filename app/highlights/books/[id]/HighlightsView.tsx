@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { StickyHeader } from "@/app/components/StickyHeader";
-import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
+import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
 
 type Highlight = {
@@ -32,13 +32,13 @@ export function HighlightsView({ bookId }: { bookId: string }) {
     load();
   }, [load]);
 
-  if (loading) return <ArticleSkeletonGrid count={4} />;
+  if (loading) return <LoadingWithLogo />;
   if (error) return <p className="text-error">{error}</p>;
 
   return (
     <div className="flex flex-col gap-4">
       <StickyHeader className="flex flex-col gap-2">
-        <h2 className="text-lg font-medium text-center">Highlights</h2>
+        <h2 className="text-base font-semibold sm:text-lg md:text-xl text-center">Highlights</h2>
         <div className="flex items-center">
           <button
             type="button"
