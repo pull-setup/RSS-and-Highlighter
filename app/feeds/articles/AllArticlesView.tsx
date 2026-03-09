@@ -38,13 +38,16 @@ export function AllArticlesView() {
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState("");
 
-  const load = useCallback((offset: number, append: boolean) => {
-    if (!append) setLoading(true);
+  const load = useCallback((offset: number, append: boolean, signal?: AbortSignal) => {
+    if (!append) {
+      setLoading(true);
+      setArticles([]);
+    }
     const limit = PAGE_SIZE;
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    return fetch(`/api/articles?${params}`)
+    return fetch(`/api/articles?${params}`, { signal })
       .then(async (r) => {
         if (!r.ok) {
           const data = await r.json().catch(() => ({}));
@@ -53,19 +56,26 @@ export function AllArticlesView() {
         return r.json() as Promise<{ articles: Article[]; total: number }>;
       })
       .then(({ articles: data, total: allTotal }) => {
+        if (signal?.aborted) return;
         setTotal(allTotal);
         setArticles((prev) => (append ? [...prev, ...data] : data));
         setHasMore(data.length === limit && offset + data.length < allTotal);
       })
-      .catch((err: Error) => setError(err.message || "Failed to load articles"))
+      .catch((err: Error) => {
+        if (err.name === "AbortError") return;
+        setError(err.message || "Failed to load articles");
+      })
       .finally(() => {
+        if (signal?.aborted) return;
         setLoading(false);
         setLoadingMore(false);
       });
   }, [bookmarkedOnly, readOnly]);
 
   useEffect(() => {
-    load(0, false);
+    const ctrl = new AbortController();
+    load(0, false, ctrl.signal);
+    return () => ctrl.abort();
   }, [load]);
 
   async function loadMore() {
@@ -145,10 +155,14 @@ export function AllArticlesView() {
         {loading ? (
           <ArticleSkeletonGrid count={PAGE_SIZE} />
         ) : articles.length === 0 ? (
-          <EmptyState
-            message="No articles yet."
-            action={{ label: "Add feeds to get started", href: "/feeds/new" }}
-          />
+          bookmarkedOnly || readOnly ? (
+            <EmptyState message="No articles match your filters." />
+          ) : (
+            <EmptyState
+              message="No articles yet."
+              action={{ label: "Add feeds to get started", href: "/feeds/new" }}
+            />
+          )
         ) : filteredArticles.length === 0 ? (
           <EmptyState message="No articles match your search or filters." />
         ) : (

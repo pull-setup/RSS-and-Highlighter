@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
+import { FeedsSkeletonGrid } from "@/app/components/ArticleSkeleton";
 
 type Feed = {
   id: number;
@@ -32,19 +33,28 @@ export function FeedsList({ search = "" }: { search?: string }) {
   const [failedFavicons, setFailedFavicons] = useState<Set<number>>(() => new Set());
 
   useEffect(() => {
+    setLoading(true);
+    const ctrl = new AbortController();
     const url = search.trim()
       ? `/api/feeds?search=${encodeURIComponent(search.trim())}`
       : "/api/feeds";
-    fetch(url)
+    fetch(url, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
-      .then(setFeeds)
-      .catch(() => setError("Failed to load feeds"))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (!ctrl.signal.aborted) setFeeds(data);
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") setError("Failed to load feeds");
+      })
+      .finally(() => {
+        if (!ctrl.signal.aborted) setLoading(false);
+      });
+    return () => ctrl.abort();
   }, [search]);
 
   const filtered = feeds;
 
-  if (loading) return <p className="text-foreground/70">Loading…</p>;
+  if (loading) return <FeedsSkeletonGrid count={6} />;
   if (error) return <p className="text-error">{error}</p>;
   if (feeds.length === 0) {
     return (

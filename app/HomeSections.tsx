@@ -28,13 +28,23 @@ export function HomeSections() {
 
   useEffect(() => {
     setLoading(true);
+    setArticles([]);
+    const ctrl = new AbortController();
     const params = new URLSearchParams({ limit: "12" });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    fetch(`/api/articles/latest?${params}`)
+    fetch(`/api/articles/latest?${params}`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : []))
-      .then(setArticles)
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (!ctrl.signal.aborted) setArticles(data);
+      })
+      .catch(() => {
+        if (!ctrl.signal.aborted) setArticles([]);
+      })
+      .finally(() => {
+        if (!ctrl.signal.aborted) setLoading(false);
+      });
+    return () => ctrl.abort();
   }, [bookmarkedOnly, readOnly]);
 
   return (
@@ -62,10 +72,14 @@ export function HomeSections() {
         {loading ? (
           <ArticleSkeletonGrid count={12} />
         ) : articles.length === 0 ? (
-          <EmptyState
-            message="No articles yet."
-            action={{ label: "Add a feed", href: "/feeds/new" }}
-          />
+          bookmarkedOnly || readOnly ? (
+            <EmptyState message="No articles match your filters." />
+          ) : (
+            <EmptyState
+              message="No articles yet."
+              action={{ label: "Add a feed", href: "/feeds/new" }}
+            />
+          )
         ) : (
           <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {articles.map((article) => (

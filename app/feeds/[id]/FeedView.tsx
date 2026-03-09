@@ -43,15 +43,19 @@ export function FeedView({
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState("");
 
-  const load = useCallback((offset: number, append: boolean) => {
-    if (!append) setLoading(true);
+  const load = useCallback((offset: number, append: boolean, signal?: AbortSignal) => {
+    if (!append) {
+      setLoading(true);
+      setArticles([]);
+    }
     const limit = PAGE_SIZE;
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    return fetch(`/api/feeds/${feedId}/articles?${params}`)
+    return fetch(`/api/feeds/${feedId}/articles?${params}`, { signal })
       .then(async (r) => {
         if (!r.ok) {
           const data = await r.json().catch(() => ({}));
@@ -60,12 +64,17 @@ export function FeedView({
         return r.json() as Promise<{ articles: Article[]; total: number }>;
       })
       .then(({ articles: data, total: feedTotal }) => {
+        if (signal?.aborted) return;
         setTotal(feedTotal);
         setArticles((prev) => (append ? [...prev, ...data] : data));
         setHasMore(data.length === limit && offset + data.length < Math.min(feedTotal, MAX_ARTICLES_PER_FEED));
       })
-      .catch((err: Error) => setError(err.message || "Failed to load articles"))
+      .catch((err: Error) => {
+        if (err.name === "AbortError") return;
+        setError(err.message || "Failed to load articles");
+      })
       .finally(() => {
+        if (signal?.aborted) return;
         setLoading(false);
         setLoadingMore(false);
         setRefreshing(false);
@@ -73,8 +82,10 @@ export function FeedView({
   }, [feedId, bookmarkedOnly, readOnly]);
 
   useEffect(() => {
-    load(0, false);
-  }, [load]);
+    const ctrl = new AbortController();
+    load(0, false, ctrl.signal);
+    return () => ctrl.abort();
+  }, [load, refreshKey]);
 
   async function loadMore() {
     if (loadingMore || !hasMore) return;
@@ -88,7 +99,7 @@ export function FeedView({
     setError("");
     try {
       await fetch(`/api/feeds/${feedId}`, { method: "PATCH" });
-      await load(0, false);
+      setRefreshKey((k) => k + 1);
     } catch {
       setError("Failed to refresh");
       setRefreshing(false);
@@ -187,7 +198,11 @@ export function FeedView({
         {loading ? (
           <ArticleSkeletonGrid count={PAGE_SIZE} />
         ) : articles.length === 0 ? (
-          <EmptyState message="No articles. Try refreshing the feed." />
+          bookmarkedOnly || readOnly ? (
+            <EmptyState message="No articles match your filters." />
+          ) : (
+            <EmptyState message="No articles. Try refreshing the feed." />
+          )
         ) : filteredArticles.length === 0 ? (
           <EmptyState message="No articles match your search or filters." />
         ) : (

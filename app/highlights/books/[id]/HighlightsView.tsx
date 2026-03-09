@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { StickyHeader } from "@/app/components/StickyHeader";
+import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
 import { EmptyState } from "@/app/components/EmptyState";
 
 type Highlight = {
@@ -31,7 +32,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
     load();
   }, [load]);
 
-  if (loading) return <p className="text-foreground/70">Loading…</p>;
+  if (loading) return <ArticleSkeletonGrid count={4} />;
   if (error) return <p className="text-error">{error}</p>;
 
   return (

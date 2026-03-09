@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
+import { BooksSkeletonList } from "@/app/components/ArticleSkeleton";
 
 type Book = {
   id: number;
@@ -25,7 +26,7 @@ export function BooksList() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-foreground/70">Loading…</p>;
+  if (loading) return <BooksSkeletonList count={4} />;
   if (error) return <p className="text-error">{error}</p>;
   if (books.length === 0) {
     return (
