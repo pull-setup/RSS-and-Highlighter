@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { AddFeedForm } from "./AddFeedForm";
+
+export const metadata: Metadata = {
+  title: "Add feed",
+};
 
 export default async function NewFeedPage() {
   const session = await auth();

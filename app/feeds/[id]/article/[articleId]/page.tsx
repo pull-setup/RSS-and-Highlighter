@@ -1,7 +1,32 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ArticleContent } from "./ArticleContent";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string; articleId: string }>;
+}): Promise<Metadata> {
+  const session = await auth();
+  if (!session) return { title: "Article" };
+  const { id: feedId, articleId } = await params;
+  let articleRow: { rows: Array<Record<string, unknown>> };
+  try {
+    articleRow = await db.execute({
+      sql: "SELECT a.title FROM articles a JOIN feeds f ON a.feed_id = f.id WHERE a.id = ? AND f.user_id = ?",
+      args: [articleId, feedId],
+    }) as { rows: Array<Record<string, unknown>> };
+  } catch {
+    return { title: "Article" };
+  }
+  if (articleRow.rows.length === 0) return { title: "Article" };
+  const row = articleRow.rows[0];
+  const articleTitle = String(row?.title ?? "").trim() || "Article";
+  return { title: articleTitle };
+}
+import { DocumentTitle } from "@/app/components/DocumentTitle";
 import { ArticleActions } from "./ArticleActions";
 import { ArticleSummary } from "./ArticleSummary";
 import { ArticleTitleSection } from "./ArticleTitleSection";
@@ -74,6 +99,7 @@ export default async function ArticlePage({
   };
   return (
     <div className="flex flex-col gap-4 pb-8 min-w-0">
+      <DocumentTitle title={article.title} />
       <div className="flex flex-col gap-3 min-w-0">
         <ArticleActions
           articleId={article.id}

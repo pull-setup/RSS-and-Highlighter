@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { BooksList } from "./BooksList";
+
+export const metadata: Metadata = {
+  title: "Kindle Highlights",
+};
 
 export default async function HighlightsPage() {
   const session = await auth();

@@ -1,7 +1,25 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { FeedView } from "./FeedView";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const session = await auth();
+  if (!session) return { title: "Feed" };
+  const { id } = await params;
+  const row = await db.execute({
+    sql: "SELECT title FROM feeds WHERE id = ? AND user_id = ?",
+    args: [id, session.user.id],
+  });
+  if (row.rows.length === 0) return { title: "Feed" };
+  const feed = row.rows[0] as unknown as { title: string };
+  return { title: feed.title };
+}
 
 export default async function FeedPage({
   params,

@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { AddBookForm } from "./AddBookForm";
+
+export const metadata: Metadata = {
+  title: "Add book",
+};
 
 export default async function NewBookPage() {
   const session = await auth();

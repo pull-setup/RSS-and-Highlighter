@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
@@ -5,6 +6,23 @@ import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { db } from "@/lib/db";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { HighlightsView } from "./HighlightsView";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const session = await auth();
+  if (!session) return { title: "Book" };
+  const { id } = await params;
+  const bookRow = await db.execute({
+    sql: "SELECT title FROM books WHERE id = ? AND user_id = ?",
+    args: [id, session.user.id],
+  });
+  if (bookRow.rows.length === 0) return { title: "Book" };
+  const book = bookRow.rows[0] as unknown as { title: string };
+  return { title: book.title };
+}
 
 export default async function BookPage({
   params,

@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "RSS & Highlights",
+  title: "ReedSync",
   description: "Personal knowledge hub: RSS reader and Kindle highlights",
 };
 
