@@ -38,7 +38,7 @@ export function StickyHeader({
   }, []);
 
   const layoutClass =
-    "-mx-3 sm:-mx-5 md:-mx-6 px-3 sm:px-5 md:px-6 mb-3 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))] [padding-top:max(0.25rem,env(safe-area-inset-top))]";
+    "-mx-5 sm:-mx-8 md:-mx-10 px-5 sm:px-8 md:px-10 mb-3 [padding-left:max(0.75rem,env(safe-area-inset-left))] [padding-right:max(0.75rem,env(safe-area-inset-right))] [padding-top:max(0.25rem,env(safe-area-inset-top))]";
 
   return (
     <>
