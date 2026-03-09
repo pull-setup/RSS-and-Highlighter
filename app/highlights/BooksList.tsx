@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
+import { cachedFetch } from "@/lib/cache";
+import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type Book = {
   id: number;
@@ -19,9 +21,11 @@ export function BooksList() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/books")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed"))))
-      .then(setBooks)
+    cachedFetch<Book[]>("/api/books")
+      .then((result) => {
+        setBooks(result.data);
+        updateCacheFooter(result.fromCache, result.timestamp);
+      })
       .catch(() => setError("Failed to load books"))
       .finally(() => setLoading(false));
   }, []);

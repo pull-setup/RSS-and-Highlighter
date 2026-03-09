@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { BookmarkIcon, CheckIcon, ChevronLeftIcon } from "@/app/components/ArticleIcons";
+import { invalidateCache } from "@/lib/cache";
 export { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 
 function isValidReturnTo(v: string | null): v is string {
@@ -56,7 +57,10 @@ export function ArticleActions({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_bookmarked: next }),
     });
-    if (res.ok) setBookmarked(next);
+    if (res.ok) {
+      setBookmarked(next);
+      invalidateCache("/api/articles");
+    }
   }
 
   async function toggle() {
@@ -66,7 +70,10 @@ export function ArticleActions({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_read: next }),
     });
-    if (res.ok) setRead(next);
+    if (res.ok) {
+      setRead(next);
+      invalidateCache("/api/articles");
+    }
   }
 
   return (

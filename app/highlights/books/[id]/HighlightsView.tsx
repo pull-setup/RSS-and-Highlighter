@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
+import { cachedFetch, invalidateCache } from "@/lib/cache";
+import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type Highlight = {
   id: number;
@@ -21,9 +23,11 @@ export function HighlightsView({ bookId }: { bookId: string }) {
   const [showForm, setShowForm] = useState(false);
 
   const load = useCallback(() => {
-    return fetch(`/api/books/${bookId}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed"))))
-      .then((data: { highlights: Highlight[] }) => setHighlights(data.highlights))
+    return cachedFetch<{ highlights: Highlight[] }>(`/api/books/${bookId}`)
+      .then((result) => {
+        setHighlights(result.data.highlights);
+        updateCacheFooter(result.fromCache, result.timestamp);
+      })
       .catch(() => setError("Failed to load highlights"))
       .finally(() => setLoading(false));
   }, [bookId]);
@@ -117,6 +121,7 @@ function AddHighlightForm({
         setError(data.error || "Failed to add highlight");
         return;
       }
+      invalidateCache("/api/books");
       setContent("");
       setLocation("");
       setNote("");

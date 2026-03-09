@@ -13,7 +13,7 @@ export function FeedsPageClient() {
     <div className="flex flex-col gap-4">
       <StickyHeader className="flex flex-col gap-2">
         <h1 className="text-base font-semibold sm:text-lg md:text-xl text-center">RSS Feeds</h1>
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <Link
             href="/"
             className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
@@ -30,7 +30,7 @@ export function FeedsPageClient() {
             placeholder="Search feeds…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted min-h-[40px] min-w-[180px] sm:min-w-[280px] sm:max-w-[400px]"
+            className="min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted min-h-[40px]"
           />
           <Link
             href="/feeds/new"

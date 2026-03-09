@@ -9,6 +9,8 @@ import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
+import { cachedFetch } from "@/lib/cache";
+import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 const PAGE_SIZE = 36;
 
@@ -48,19 +50,15 @@ export function AllArticlesView() {
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    return fetch(`/api/articles?${params}`, { signal })
-      .then(async (r) => {
-        if (!r.ok) {
-          const data = await r.json().catch(() => ({}));
-          throw new Error((data as { error?: string }).error || `Failed (${r.status})`);
-        }
-        return r.json() as Promise<{ articles: Article[]; total: number }>;
-      })
-      .then(({ articles: data, total: allTotal }) => {
+    return cachedFetch<{ articles: Article[]; total: number }>(`/api/articles?${params}`, { signal })
+      .then((result) => {
         if (signal?.aborted) return;
-        setTotal(allTotal);
-        setArticles((prev) => (append ? [...prev, ...data] : data));
-        setHasMore(data.length === limit && offset + data.length < allTotal);
+        setTotal(result.data.total);
+        setArticles((prev) => (append ? [...prev, ...result.data.articles] : result.data.articles));
+        setHasMore(result.data.articles.length === limit && offset + result.data.articles.length < result.data.total);
+        if (!append) {
+          updateCacheFooter(result.fromCache, result.timestamp);
+        }
       })
       .catch((err: Error) => {
         if (err.name === "AbortError") return;

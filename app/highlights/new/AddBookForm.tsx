@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { invalidateCache } from "@/lib/cache";
 
 export function AddBookForm() {
   const [title, setTitle] = useState("");
@@ -31,6 +32,7 @@ export function AddBookForm() {
         setError(data.error || "Failed to add book");
         return;
       }
+      invalidateCache("/api/books");
       router.push(`/highlights/books/${data.id}`);
       router.refresh();
     } finally {

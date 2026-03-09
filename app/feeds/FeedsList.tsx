@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
+import { cachedFetch } from "@/lib/cache";
+import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type Feed = {
   id: number;
@@ -38,17 +40,22 @@ export function FeedsList({ search = "" }: { search?: string }) {
     const url = search.trim()
       ? `/api/feeds?search=${encodeURIComponent(search.trim())}`
       : "/api/feeds";
-    fetch(url, { signal: ctrl.signal })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
-      .then((data) => {
-        if (!ctrl.signal.aborted) setFeeds(data);
+    
+    cachedFetch<Feed[]>(url, { signal: ctrl.signal })
+      .then((result) => {
+        if (!ctrl.signal.aborted) {
+          setFeeds(result.data);
+          updateCacheFooter(result.fromCache, result.timestamp);
+          setLoading(false);
+        }
       })
       .catch((err) => {
-        if (err.name !== "AbortError") setError("Failed to load feeds");
-      })
-      .finally(() => {
-        if (!ctrl.signal.aborted) setLoading(false);
+        if (err.name !== "AbortError") {
+          setError("Failed to load feeds");
+          setLoading(false);
+        }
       });
+    
     return () => ctrl.abort();
   }, [search]);
 

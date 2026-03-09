@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { invalidateCache } from "@/lib/cache";
 
 export function AddFeedForm() {
   const [url, setUrl] = useState("");
@@ -25,6 +26,7 @@ export function AddFeedForm() {
         setError(data.error || "Failed to add feed");
         return;
       }
+      invalidateCache("/api/feeds");
       router.push(`/feeds/${data.id}`);
       router.refresh();
     } finally {

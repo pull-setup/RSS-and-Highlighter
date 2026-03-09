@@ -7,6 +7,8 @@ import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxe
 import { ChevronRightIcon } from "@/app/components/ArticleIcons";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
+import { cachedFetch } from "@/lib/cache";
+import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type LatestArticle = {
   id: number;
@@ -33,10 +35,12 @@ export function HomeSections() {
     const params = new URLSearchParams({ limit: "12" });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    fetch(`/api/articles/latest?${params}`, { signal: ctrl.signal })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data) => {
-        if (!ctrl.signal.aborted) setArticles(data);
+    cachedFetch<LatestArticle[]>(`/api/articles/latest?${params}`, { signal: ctrl.signal })
+      .then((result) => {
+        if (!ctrl.signal.aborted) {
+          setArticles(result.data);
+          updateCacheFooter(result.fromCache, result.timestamp);
+        }
       })
       .catch(() => {
         if (!ctrl.signal.aborted) setArticles([]);

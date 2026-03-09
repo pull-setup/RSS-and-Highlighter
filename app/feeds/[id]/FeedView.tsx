@@ -10,6 +10,8 @@ import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
+import { cachedFetch, invalidateCache } from "@/lib/cache";
+import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 const PAGE_SIZE = 36;
 
@@ -56,19 +58,15 @@ export function FeedView({
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    return fetch(`/api/feeds/${feedId}/articles?${params}`, { signal })
-      .then(async (r) => {
-        if (!r.ok) {
-          const data = await r.json().catch(() => ({}));
-          throw new Error((data as { error?: string }).error || `Failed (${r.status})`);
-        }
-        return r.json() as Promise<{ articles: Article[]; total: number }>;
-      })
-      .then(({ articles: data, total: feedTotal }) => {
+    return cachedFetch<{ articles: Article[]; total: number }>(`/api/feeds/${feedId}/articles?${params}`, { signal })
+      .then((result) => {
         if (signal?.aborted) return;
-        setTotal(feedTotal);
-        setArticles((prev) => (append ? [...prev, ...data] : data));
-        setHasMore(data.length === limit && offset + data.length < Math.min(feedTotal, MAX_ARTICLES_PER_FEED));
+        setTotal(result.data.total);
+        setArticles((prev) => (append ? [...prev, ...result.data.articles] : result.data.articles));
+        setHasMore(result.data.articles.length === limit && offset + result.data.articles.length < Math.min(result.data.total, MAX_ARTICLES_PER_FEED));
+        if (!append) {
+          updateCacheFooter(result.fromCache, result.timestamp);
+        }
       })
       .catch((err: Error) => {
         if (err.name === "AbortError") return;
@@ -100,6 +98,8 @@ export function FeedView({
     setError("");
     try {
       await fetch(`/api/feeds/${feedId}`, { method: "PATCH" });
+      invalidateCache("/api/feeds");
+      invalidateCache("/api/articles");
       setRefreshKey((k) => k + 1);
     } catch {
       setError("Failed to refresh");
