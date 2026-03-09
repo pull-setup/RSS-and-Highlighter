@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
-import { cachedFetch, invalidateCache } from "@/lib/cache";
+import { RefreshIcon } from "@/app/components/ArticleIcons";
+import { cachedFetch, invalidateCache, freshFetch } from "@/lib/cache";
 import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type Highlight = {
@@ -19,22 +20,39 @@ type Highlight = {
 export function HighlightsView({ bookId }: { bookId: string }) {
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
 
-  const load = useCallback(() => {
-    return cachedFetch<{ highlights: Highlight[] }>(`/api/books/${bookId}`)
-      .then((result) => {
-        setHighlights(result.data.highlights);
-        updateCacheFooter(result.fromCache, result.timestamp);
-      })
-      .catch(() => setError("Failed to load highlights"))
-      .finally(() => setLoading(false));
+  const load = useCallback(async (useCache = true) => {
+    if (useCache) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+      invalidateCache(`/api/books/${bookId}`);
+    }
+
+    try {
+      const result = useCache
+        ? await cachedFetch<{ highlights: Highlight[] }>(`/api/books/${bookId}`)
+        : await freshFetch<{ highlights: Highlight[] }>(`/api/books/${bookId}`);
+      setHighlights(result.data.highlights);
+      updateCacheFooter(result.fromCache, result.timestamp);
+    } catch {
+      setError("Failed to load highlights");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, [bookId]);
 
   useEffect(() => {
-    load();
+    load(true);
   }, [load]);
+
+  const handleRefresh = () => {
+    load(false);
+  };
 
   if (loading) return <LoadingWithLogo />;
   if (error) return <p className="text-error">{error}</p>;
@@ -43,7 +61,16 @@ export function HighlightsView({ bookId }: { bookId: string }) {
     <div className="flex flex-col gap-4">
       <StickyHeader className="flex flex-col gap-2">
         <h2 className="text-base font-semibold sm:text-lg md:text-xl text-center">Highlights</h2>
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground disabled:opacity-50"
+            aria-label="Refresh highlights"
+          >
+            <RefreshIcon className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+          </button>
           <button
             type="button"
             onClick={() => setShowForm((s) => !s)}
@@ -58,7 +85,7 @@ export function HighlightsView({ bookId }: { bookId: string }) {
           bookId={bookId}
           onAdded={() => {
             setShowForm(false);
-            load();
+            load(false);
           }}
         />
       )}
@@ -176,7 +203,7 @@ function AddHighlightForm({
         <button
           type="button"
           onClick={() => { setContent(""); setLocation(""); setNote(""); }}
-          className="rounded border border-border py-2 px-4 text-sm text-foreground hover:bg-surface"
+          className="rounded border border-border py-2 px-2 px-4 text-sm text-foreground hover:bg-surface"
         >
           Clear
         </button>

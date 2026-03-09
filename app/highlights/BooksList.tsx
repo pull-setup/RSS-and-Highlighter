@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
-import { cachedFetch } from "@/lib/cache";
+import { cachedFetch, invalidateCache, freshFetch } from "@/lib/cache";
 import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type Book = {
@@ -15,19 +15,37 @@ type Book = {
   created_at: string;
 };
 
-export function BooksList() {
+export const BooksList = forwardRef<{ refresh: () => void }, {}>((_, ref) => {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const loadBooks = async (useCache = true) => {
+    if (useCache) {
+      setLoading(true);
+    } else {
+      invalidateCache("/api/books");
+    }
+
+    try {
+      const result = useCache
+        ? await cachedFetch<Book[]>("/api/books")
+        : await freshFetch<Book[]>("/api/books");
+      setBooks(result.data);
+      updateCacheFooter(result.fromCache, result.timestamp);
+    } catch {
+      setError("Failed to load books");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    refresh: () => loadBooks(false),
+  }));
+
   useEffect(() => {
-    cachedFetch<Book[]>("/api/books")
-      .then((result) => {
-        setBooks(result.data);
-        updateCacheFooter(result.fromCache, result.timestamp);
-      })
-      .catch(() => setError("Failed to load books"))
-      .finally(() => setLoading(false));
+    loadBooks(true);
   }, []);
 
   if (loading) return <LoadingWithLogo />;
@@ -56,4 +74,6 @@ export function BooksList() {
       ))}
     </ul>
   );
-}
+});
+
+BooksList.displayName = "BooksList";

@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
-import { ChevronRightIcon } from "@/app/components/ArticleIcons";
+import { ChevronRightIcon, RefreshIcon } from "@/app/components/ArticleIcons";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
-import { cachedFetch } from "@/lib/cache";
+import { NewsBrief } from "@/app/components/NewsBrief";
+import { cachedFetch, invalidateCache, freshFetch } from "@/lib/cache";
 import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type LatestArticle = {
@@ -25,35 +26,59 @@ type LatestArticle = {
 export function HomeSections() {
   const [articles, setArticles] = useState<LatestArticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    setArticles([]);
+  const loadArticles = async (useCache = true) => {
     const ctrl = new AbortController();
-    const params = new URLSearchParams({ limit: "12" });
+    const params = new URLSearchParams({ limit: "8" });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    cachedFetch<LatestArticle[]>(`/api/articles/latest?${params}`, { signal: ctrl.signal })
-      .then((result) => {
-        if (!ctrl.signal.aborted) {
-          setArticles(result.data);
-          updateCacheFooter(result.fromCache, result.timestamp);
-        }
-      })
-      .catch(() => {
-        if (!ctrl.signal.aborted) setArticles([]);
-      })
-      .finally(() => {
-        if (!ctrl.signal.aborted) setLoading(false);
-      });
-    return () => ctrl.abort();
+    const url = `/api/articles/latest?${params}`;
+
+    if (useCache) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+      invalidateCache("/api/articles");
+    }
+
+    try {
+      const result = useCache
+        ? await cachedFetch<LatestArticle[]>(url, { signal: ctrl.signal })
+        : await freshFetch<LatestArticle[]>(url, { signal: ctrl.signal });
+      
+      if (!ctrl.signal.aborted) {
+        setArticles(result.data);
+        updateCacheFooter(result.fromCache, result.timestamp);
+      }
+    } catch {
+      if (!ctrl.signal.aborted) setArticles([]);
+    } finally {
+      if (!ctrl.signal.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadArticles(true);
   }, [bookmarkedOnly, readOnly]);
+
+  const handleRefresh = () => {
+    loadArticles(false);
+  };
 
   return (
     <div className="flex min-h-[80vh] flex-col gap-3">
-      {/* 1st half: RSS – latest 12 articles */}
+      {/* News Brief Section */}
+      <NewsBrief />
+
+      <div className="my-3 border-t border-border" role="separator" />
+
+      {/* Articles Section */}
       <div className="flex flex-col gap-2 min-h-[40vh]">
         <StickyHeader className="flex flex-wrap items-center justify-between gap-1.5">
           <h2 className="text-base font-semibold sm:text-lg md:text-xl">Articles</h2>
@@ -64,6 +89,15 @@ export function HomeSections() {
               onBookmarkedOnlyChange={setBookmarkedOnly}
               onReadOnlyChange={setReadOnly}
             />
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing || loading}
+              className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground disabled:opacity-50"
+              aria-label="Refresh articles"
+            >
+              <RefreshIcon className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            </button>
             <Link
               href="/feeds/articles"
               className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground"
@@ -138,8 +172,8 @@ export function HomeSections() {
 
       <div className="my-3 border-t border-border" role="separator" />
 
-      {/* 2nd half: Highlights – placeholder */}
-      <div className="flex flex-col gap-2 min-h-[40vh]">
+      {/* Highlights Section */}
+      <div className="flex flex-col gap-2 min-h-[40vh] pb-8 sm:pb-12">
         <StickyHeader className="flex flex-wrap items-center justify-between gap-1.5">
           <h2 className="text-base font-semibold sm:text-lg md:text-xl">Highlights</h2>
           <Link

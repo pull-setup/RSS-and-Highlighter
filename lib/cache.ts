@@ -1,9 +1,9 @@
 /**
  * Client-side cache utility with TTL support
- * Cache duration: 5-6 hours (5.5 hours = 19800000ms)
+ * Cache duration: 4 hours (14400000ms)
  */
 
-const CACHE_DURATION_MS = 5.5 * 60 * 60 * 1000; // 5.5 hours
+const CACHE_DURATION_MS = 4 * 60 * 60 * 1000; // 4 hours
 const CACHE_PREFIX = "reedsync_cache_";
 
 interface CacheEntry<T> {

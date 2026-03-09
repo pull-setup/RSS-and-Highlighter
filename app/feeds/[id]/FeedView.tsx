@@ -10,7 +10,7 @@ import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
 import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
 import { MAX_ARTICLES_PER_FEED } from "@/lib/feeds";
-import { cachedFetch, invalidateCache } from "@/lib/cache";
+import { cachedFetch, invalidateCache, freshFetch } from "@/lib/cache";
 import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 const PAGE_SIZE = 36;
@@ -49,7 +49,7 @@ export function FeedView({
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState("");
 
-  const load = useCallback((offset: number, append: boolean, signal?: AbortSignal) => {
+  const load = useCallback((offset: number, append: boolean, useCache = true, signal?: AbortSignal) => {
     if (!append) {
       setLoading(true);
       setArticles([]);
@@ -58,7 +58,14 @@ export function FeedView({
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    return cachedFetch<{ articles: Article[]; total: number }>(`/api/feeds/${feedId}/articles?${params}`, { signal })
+    const url = `/api/feeds/${feedId}/articles?${params}`;
+    
+    if (!useCache && !append) {
+      invalidateCache(`/api/feeds/${feedId}/articles`);
+    }
+
+    const fetchFn = useCache ? cachedFetch : freshFetch;
+    return fetchFn<{ articles: Article[]; total: number }>(url, { signal })
       .then((result) => {
         if (signal?.aborted) return;
         setTotal(result.data.total);
@@ -82,7 +89,7 @@ export function FeedView({
 
   useEffect(() => {
     const ctrl = new AbortController();
-    load(0, false, ctrl.signal);
+    load(0, false, true, ctrl.signal);
     return () => ctrl.abort();
   }, [load, refreshKey]);
 
@@ -90,7 +97,7 @@ export function FeedView({
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     setError("");
-    await load(articles.length, true);
+    await load(articles.length, true, true);
   }
 
   async function refresh() {
@@ -100,6 +107,7 @@ export function FeedView({
       await fetch(`/api/feeds/${feedId}`, { method: "PATCH" });
       invalidateCache("/api/feeds");
       invalidateCache("/api/articles");
+      invalidateCache(`/api/feeds/${feedId}/articles`);
       setRefreshKey((k) => k + 1);
     } catch {
       setError("Failed to refresh");

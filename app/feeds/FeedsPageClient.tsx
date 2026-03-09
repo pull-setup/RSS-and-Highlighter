@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
+import { ChevronLeftIcon, RefreshIcon } from "@/app/components/ArticleIcons";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { FeedsList } from "./FeedsList";
 
 export function FeedsPageClient() {
   const [search, setSearch] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const feedsListRef = useRef<{ refresh: () => void }>(null);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    feedsListRef.current?.refresh();
+    setTimeout(() => setRefreshing(false), 1000);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -32,6 +40,15 @@ export function FeedsPageClient() {
             onChange={(e) => setSearch(e.target.value)}
             className="min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted min-h-[40px]"
           />
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground disabled:opacity-50"
+            aria-label="Refresh feeds"
+          >
+            <RefreshIcon className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+          </button>
           <Link
             href="/feeds/new"
             aria-label="Add feed"
@@ -43,7 +60,7 @@ export function FeedsPageClient() {
           </Link>
         </div>
       </StickyHeader>
-      <FeedsList search={search} />
+      <FeedsList search={search} ref={feedsListRef} />
     </div>
   );
 }

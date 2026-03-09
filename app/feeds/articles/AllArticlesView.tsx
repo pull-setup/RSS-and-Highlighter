@@ -4,12 +4,12 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { StickyHeader } from "@/app/components/StickyHeader";
 import { ArticleFilterCheckboxes } from "@/app/components/ArticleFilterCheckboxes";
-import { ChevronLeftIcon } from "@/app/components/ArticleIcons";
+import { ChevronLeftIcon, RefreshIcon } from "@/app/components/ArticleIcons";
 import { ArticleSkeletonGrid } from "@/app/components/ArticleSkeleton";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
 import { EmptyState } from "@/app/components/EmptyState";
 import { HighlightText } from "@/app/components/HighlightText";
-import { cachedFetch } from "@/lib/cache";
+import { cachedFetch, invalidateCache, freshFetch } from "@/lib/cache";
 import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 const PAGE_SIZE = 36;
@@ -39,9 +39,10 @@ export function AllArticlesView() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
 
-  const load = useCallback((offset: number, append: boolean, signal?: AbortSignal) => {
+  const load = useCallback((offset: number, append: boolean, useCache = true, signal?: AbortSignal) => {
     if (!append) {
       setLoading(true);
       setArticles([]);
@@ -50,7 +51,14 @@ export function AllArticlesView() {
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     if (bookmarkedOnly) params.set("bookmarkedOnly", "true");
     if (readOnly) params.set("readOnly", "true");
-    return cachedFetch<{ articles: Article[]; total: number }>(`/api/articles?${params}`, { signal })
+    const url = `/api/articles?${params}`;
+    
+    if (!useCache && !append) {
+      invalidateCache("/api/articles");
+    }
+
+    const fetchFn = useCache ? cachedFetch : freshFetch;
+    return fetchFn<{ articles: Article[]; total: number }>(url, { signal })
       .then((result) => {
         if (signal?.aborted) return;
         setTotal(result.data.total);
@@ -68,12 +76,13 @@ export function AllArticlesView() {
         if (signal?.aborted) return;
         setLoading(false);
         setLoadingMore(false);
+        setRefreshing(false);
       });
   }, [bookmarkedOnly, readOnly]);
 
   useEffect(() => {
     const ctrl = new AbortController();
-    load(0, false, ctrl.signal);
+    load(0, false, true, ctrl.signal);
     return () => ctrl.abort();
   }, [load]);
 
@@ -81,7 +90,13 @@ export function AllArticlesView() {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     setError("");
-    await load(articles.length, true);
+    await load(articles.length, true, true);
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setError("");
+    await load(0, false, false);
   }
 
   const searchLower = search.trim().toLowerCase();
@@ -148,6 +163,15 @@ export function AllArticlesView() {
                 onBookmarkedOnlyChange={setBookmarkedOnly}
                 onReadOnlyChange={setReadOnly}
               />
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={refreshing || loading}
+                className="flex min-h-[40px] min-w-[40px] shrink-0 items-center justify-center rounded border border-border px-2 py-2 text-muted transition-colors hover:bg-surface hover:text-foreground disabled:opacity-50"
+                aria-label="Refresh articles"
+              >
+                <RefreshIcon className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+              </button>
             </div>
           </div>
         </StickyHeader>

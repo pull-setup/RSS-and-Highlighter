@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import Link from "next/link";
 import { EmptyState } from "@/app/components/EmptyState";
 import { LoadingWithLogo } from "@/app/components/LoadingWithLogo";
-import { cachedFetch } from "@/lib/cache";
+import { cachedFetch, invalidateCache, freshFetch } from "@/lib/cache";
 import { updateCacheFooter } from "@/app/components/CacheFooter";
 
 type Feed = {
@@ -28,35 +28,52 @@ function feedFaviconUrl(feed: Feed): string | null {
   }
 }
 
-export function FeedsList({ search = "" }: { search?: string }) {
+export const FeedsList = forwardRef<
+  { refresh: () => void },
+  { search?: string }
+>(({ search = "" }, ref) => {
   const [feeds, setFeeds] = useState<Feed[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [failedFavicons, setFailedFavicons] = useState<Set<number>>(() => new Set());
 
-  useEffect(() => {
-    setLoading(true);
+  const loadFeeds = async (useCache = true) => {
     const ctrl = new AbortController();
     const url = search.trim()
       ? `/api/feeds?search=${encodeURIComponent(search.trim())}`
       : "/api/feeds";
     
-    cachedFetch<Feed[]>(url, { signal: ctrl.signal })
-      .then((result) => {
-        if (!ctrl.signal.aborted) {
-          setFeeds(result.data);
-          updateCacheFooter(result.fromCache, result.timestamp);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          setError("Failed to load feeds");
-          setLoading(false);
-        }
-      });
-    
-    return () => ctrl.abort();
+    if (useCache) {
+      setLoading(true);
+    }
+
+    try {
+      const result = useCache
+        ? await cachedFetch<Feed[]>(url, { signal: ctrl.signal })
+        : await freshFetch<Feed[]>(url, { signal: ctrl.signal });
+      
+      if (!ctrl.signal.aborted) {
+        setFeeds(result.data);
+        updateCacheFooter(result.fromCache, result.timestamp);
+        setLoading(false);
+      }
+    } catch (err: any) {
+      if (err.name !== "AbortError") {
+        setError("Failed to load feeds");
+        setLoading(false);
+      }
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    refresh: () => {
+      invalidateCache("/api/feeds");
+      loadFeeds(false);
+    },
+  }));
+
+  useEffect(() => {
+    loadFeeds(true);
   }, [search]);
 
   const filtered = feeds;
@@ -126,4 +143,6 @@ export function FeedsList({ search = "" }: { search?: string }) {
       })}
     </ul>
   );
-}
+});
+
+FeedsList.displayName = "FeedsList";
